@@ -39,6 +39,11 @@ export default function Navbar() {
                       Proxy Mod
                     </a>
                   </li>
+                  <li className="flex">
+                    <a className="text-white text-xl" href="https://github.com/aidendotgg/tnttag.info" target="_blank">
+                      GitHub
+                    </a>
+                  </li>
                 </ul>
               </nav>
             </div>
@@ -69,6 +74,11 @@ export default function Navbar() {
               <li className="flex">
                 <a className="text-white text-xl" href="https://github.com/aidendotgg/tnttagutilities" target="_blank">
                   Proxy Mod
+                </a>
+              </li>
+              <li className="flex">
+                <a className="text-white text-xl" href="https://github.com/aidendotgg/tnttag.info" target="_blank">
+                  GitHub
                 </a>
               </li>
             </ul>
