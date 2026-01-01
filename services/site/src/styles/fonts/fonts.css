@@ -1,0 +1,11 @@
+@font-face {
+    font-family: Minecraft;
+    src: url('minecraft-regular.otf');
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: Minecraft;
+    src: url('minecraft-bold.otf');
+    font-weight: bold;
+}

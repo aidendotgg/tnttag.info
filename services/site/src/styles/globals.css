@@ -1,0 +1,41 @@
+@import url('./fonts/fonts.css');
+
+@import "tailwindcss";
+
+@source inline("{text,bg}-minecraft-{red,gold,green,yellow,light_purple,white,blue,dark_green,dark_red,dark_aqua,aqua,dark_purple,dark_gray,gray,black,dark_blue}");
+
+@theme {
+  --color-minecraft-red: #ff5555;
+  --color-minecraft-gold: #ffaa00;
+  --color-minecraft-green: #55ff55;
+  --color-minecraft-yellow: #ffff55;
+  --color-minecraft-light_purple: #ff55ff;
+  --color-minecraft-white: #ffffff;
+  --color-minecraft-blue: #5555ff;
+  --color-minecraft-dark_green: #00aa00;
+  --color-minecraft-dark_red: #aa0000;
+  --color-minecraft-dark_aqua: #00aaaa;
+  --color-minecraft-aqua: #55ffff;
+  --color-minecraft-dark_purple: #aa00aa;
+  --color-minecraft-dark_gray: #555555;
+  --color-minecraft-gray: #aaaaaa;
+  --color-minecraft-black: #000000;
+  --color-minecraft-dark_blue: #0000aa;
+
+  --border-width-1: 1px;
+}
+
+body {
+  background: black;
+  color: white;
+  font-family: 'Minecraft', sans-serif;
+  color-scheme: dark;
+}
+
+.text-minecraft-black {
+  text-shadow: 0 0 10px white
+}
+
+button:hover {
+  cursor: pointer;
+}
