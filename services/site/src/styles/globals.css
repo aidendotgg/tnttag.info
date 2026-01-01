@@ -1,6 +1,6 @@
 @import url('./fonts/fonts.css');
 
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @source inline("{text,bg}-minecraft-{red,gold,green,yellow,light_purple,white,blue,dark_green,dark_red,dark_aqua,aqua,dark_purple,dark_gray,gray,black,dark_blue}");
 
@@ -33,7 +33,7 @@ body {
 }
 
 .text-minecraft-black {
-  text-shadow: 0 0 10px white
+  text-shadow: 0 0 10px white;
 }
 
 button:hover {

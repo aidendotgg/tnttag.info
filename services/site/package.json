@@ -6,7 +6,8 @@
     "dev": "next dev -p 3142",
     "build": "next build",
     "start": "next start -p 3142",
-    "lint": "eslint"
+    "lint": "eslint",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@tnttag/fetch": "workspace:*",
@@ -25,6 +26,9 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "prettier": "^3.7.4",
     "tailwindcss": "^4.1.18",
     "typescript": "^5"
   }
