@@ -107,96 +107,16 @@ export default function Username() {
         toValue: number;
       }
     >([
-      [
-        5000,
-        {
-          fromColor: 'black',
-          toColor: 'black',
-          fromValue: 5000,
-          toValue: 10000,
-        },
-      ],
-      [
-        2500,
-        {
-          fromColor: 'red',
-          toColor: 'black',
-          fromValue: 2500,
-          toValue: 5000,
-        },
-      ],
-      [
-        1500,
-        {
-          fromColor: 'gold',
-          toColor: 'red',
-          fromValue: 1500,
-          toValue: 2500,
-        },
-      ],
-      [
-        1000,
-        {
-          fromColor: 'dark_purple',
-          toColor: 'gold',
-          fromValue: 1000,
-          toValue: 1500,
-        },
-      ],
-      [
-        500,
-        {
-          fromColor: 'blue',
-          toColor: 'dark_purple',
-          fromValue: 500,
-          toValue: 1000,
-        },
-      ],
-      [
-        250,
-        {
-          fromColor: 'green',
-          toColor: 'blue',
-          fromValue: 250,
-          toValue: 500,
-        },
-      ],
-      [
-        100,
-        {
-          fromColor: 'dark_green',
-          toColor: 'green',
-          fromValue: 100,
-          toValue: 250,
-        },
-      ],
-      [
-        50,
-        {
-          fromColor: 'white',
-          toColor: 'dark_green',
-          fromValue: 50,
-          toValue: 100,
-        },
-      ],
-      [
-        15,
-        {
-          fromColor: 'gray',
-          toColor: 'white',
-          fromValue: 15,
-          toValue: 50,
-        },
-      ],
-      [
-        0,
-        {
-          fromColor: 'dark_gray',
-          toColor: 'gray',
-          fromValue: 0,
-          toValue: 15,
-        },
-      ],
+      [5000, { fromColor: 'black', toColor: 'black', fromValue: 5000, toValue: 10000 }],
+      [2500, { fromColor: 'red', toColor: 'black', fromValue: 2500, toValue: 5000 }],
+      [1500, { fromColor: 'gold', toColor: 'red', fromValue: 1500, toValue: 2500 }],
+      [1000, { fromColor: 'dark_purple', toColor: 'gold', fromValue: 1000, toValue: 1500 }],
+      [500, { fromColor: 'blue', toColor: 'dark_purple', fromValue: 500, toValue: 1000 }],
+      [250, { fromColor: 'green', toColor: 'blue', fromValue: 250, toValue: 500 }],
+      [100, { fromColor: 'dark_green', toColor: 'green', fromValue: 100, toValue: 250 }],
+      [50, { fromColor: 'white', toColor: 'dark_green', fromValue: 50, toValue: 100 }],
+      [15, { fromColor: 'gray', toColor: 'white', fromValue: 15, toValue: 50 }],
+      [0, { fromColor: 'dark_gray', toColor: 'gray', fromValue: 0, toValue: 15 }],
     ]);
 
     for (const [milestone, data] of winColorMap) {
@@ -490,7 +410,7 @@ export default function Username() {
                     <div className="grid min-[1160px]:grid-cols-2 min-[730px]:grid-cols-3 min-[425px]:grid-cols-2 grid-cols-1 gap-2 overflow-y-auto max-h-134 w-full">
                       {cosmeticValues.map((cosmetic, index) => (
                         <>
-                          <div className={`flex w-full flex-col rounded-md bg-neutral-900 p-2 border-1 ${cosmetic.unlocked ? 'border-minecraft-green' : 'border-minecraft-red'} `} key={index}>
+                          <div className={`flex w-full flex-col rounded-md bg-neutral-900 p-2 border-1 ${cosmetic.unlocked ? 'border-minecraft-green' : 'border-minecraft-red'} `} key={cosmetic.name + index}>
                             <img src={`/icons/${cosmetic.name}.png`} className="flex h-14 w-14 mx-auto" />
                             <p className="text-center text-lg">{truncateString(formatCosmetic(cosmetic.name), 16)}</p>
                           </div>
