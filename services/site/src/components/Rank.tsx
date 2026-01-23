@@ -33,7 +33,7 @@ export default function Rank({ username, rank, rankColor, plusColor }: { usernam
       return (
         <>
           <span className="text-minecraft-aqua">[MVP</span>
-          <span style={{ color: plusColor }}>+</span>
+          <span className="text-minecraft" style={{ color: plusColor }}>+</span>
           <span className="text-minecraft-aqua">]&nbsp;</span>
           <span className="text-minecraft-aqua">{username}</span>
         </>
@@ -41,10 +41,10 @@ export default function Rank({ username, rank, rankColor, plusColor }: { usernam
     case 'MVP_PLUS_PLUS':
       return (
         <>
-          <span style={{ color: rankColor }}>[MVP</span>
-          <span style={{ color: plusColor }}>++</span>
-          <span style={{ color: rankColor }}>]&nbsp;</span>
-          <span style={{ color: rankColor }}>{username}</span>
+          <span className="text-minecraft" style={{ color: rankColor }}>[MVP</span>
+          <span className="text-minecraft" style={{ color: plusColor }}>++</span>
+          <span className="text-minecraft" style={{ color: rankColor }}>]&nbsp;</span>
+          <span className="text-minecraft" style={{ color: rankColor }}>{username}</span>
         </>
       );
     case 'YOUTUBER':

@@ -65,7 +65,7 @@ export default function PlayerSearch() {
           onChange={(e) => {
             setIdentifier(e.target.value);
           }}
-          className="w-full bg-neutral-900 border-1 z-10 border-neutral-800 text-white text-xl placeholder:text-gray-300 placeholder:text-xl p-2 rounded-md outline-none"
+          className="w-full bg-neutral-900 border-1 z-10 border-neutral-800 text-minecraft-white text-xl placeholder:text-gray-300 placeholder:text-xl p-2 rounded-md outline-none"
           placeholder="Player"
           autoComplete="off"
           onKeyDown={(e) => {
@@ -90,8 +90,8 @@ export default function PlayerSearch() {
         />
         {identifier && identifier.length >= 3 && (
           <div id="resultbox" className="absolute translate-y-[3.2rem] w-full max-h-48 overflow-y-auto bg-neutral-900 border-1 border-neutral-800 rounded-md items-center duration-300">
-            {autoCompleteLoading && <p className="text-white text-center p-2 text-xl">Loading...</p>}
-            {autoComplete.length === 0 && !autoCompleteLoading && <p className="text-white text-center p-2 text-xl">No players found</p>}
+            {autoCompleteLoading && <p className="text-minecraft-white text-center p-2 text-xl">Loading...</p>}
+            {autoComplete.length === 0 && !autoCompleteLoading && <p className="text-minecraft-white text-center p-2 text-xl">No players found</p>}
             <ul className="flex flex-col">
               {autoComplete.map((player: User, i) => (
                 <li key={player._id} className="flex">
@@ -100,7 +100,7 @@ export default function PlayerSearch() {
                     className={`${i === highlightIndex ? 'bg-neutral-800' : ''} flex flex-row gap-2 items-center hover:bg-neutral-800 w-full px-2 py-1.5`}
                   >
                     <img alt="" className="w-8 h-8 rounded-sm" loading="lazy" src={`https://minotar.net/avatar/${player._id}`} />
-                    <p className="text-white text-xl">{player.username}</p>
+                    <p className="text-minecraft-white text-xl">{player.username}</p>
                   </button>
                 </li>
               ))}

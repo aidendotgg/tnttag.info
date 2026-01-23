@@ -32,6 +32,10 @@ body {
   color-scheme: dark;
 }
 
+[class*="text-minecraft"] {
+  text-shadow: 0.1em 0.1em color-mix(in srgb, currentcolor 25%, #000 75%);
+}
+
 .text-minecraft-black {
   text-shadow: 0 0 10px white;
 }

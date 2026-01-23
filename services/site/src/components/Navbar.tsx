@@ -22,7 +22,7 @@ export default function Navbar() {
             <div className="flex flex-row items-center">
               <div onClick={() => router.push('/')} className="flex flex-row z-10 items-center hover:cursor-pointer pl-4 py-0.5">
                 <img alt="" className="h-14 p-2" src="/tntblock.png" />
-                <h1 className="text-white text-2xl">
+                <h1 className="text-minecraft-white text-2xl">
                   <span className="text-minecraft-red">TNT</span>
                   Tag.info
                 </h1>
@@ -30,17 +30,17 @@ export default function Navbar() {
               <nav className="min-[900px]:flex hidden justify-center absolute w-full">
                 <ul className="flex flex-row gap-6">
                   <li className="flex">
-                    <button className="text-white text-xl" onClick={() => router.push('/leaderboard')}>
+                    <button className="text-minecraft-white text-xl" onClick={() => router.push('/leaderboard')}>
                       Leaderboard
                     </button>
                   </li>
                   <li className="flex">
-                    <a className="text-white text-xl" href="https://github.com/aidendotgg/tnttagutilities" target="_blank">
+                    <a className="text-minecraft-white text-xl" href="https://github.com/aidendotgg/tnttagutilities" target="_blank">
                       Proxy Mod
                     </a>
                   </li>
                   <li className="flex">
-                    <a className="text-white text-xl" href="https://github.com/aidendotgg/tnttag.info" target="_blank">
+                    <a className="text-minecraft-white text-xl" href="https://github.com/aidendotgg/tnttag.info" target="_blank">
                       GitHub
                     </a>
                   </li>
@@ -67,17 +67,17 @@ export default function Navbar() {
           {showDropdown && (
             <ul className="flex flex-col gap-2 pb-2 justify-center items-center w-full">
               <li className="flex">
-                <button className="text-white text-xl" onClick={() => router.push('/leaderboard')}>
+                <button className="text-minecraft-white text-xl" onClick={() => router.push('/leaderboard')}>
                   Leaderboard
                 </button>
               </li>
               <li className="flex">
-                <a className="text-white text-xl" href="https://github.com/aidendotgg/tnttagutilities" target="_blank">
+                <a className="text-minecraft-white text-xl" href="https://github.com/aidendotgg/tnttagutilities" target="_blank">
                   Proxy Mod
                 </a>
               </li>
               <li className="flex">
-                <a className="text-white text-xl" href="https://github.com/aidendotgg/tnttag.info" target="_blank">
+                <a className="text-minecraft-white text-xl" href="https://github.com/aidendotgg/tnttag.info" target="_blank">
                   GitHub
                 </a>
               </li>
