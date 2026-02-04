@@ -1,10 +1,3 @@
-export interface Status {
-    online: boolean
-    playing: string
-    mode: string
-    map: string
-}
-
 export interface User {
   _id: string
   username: string
@@ -53,4 +46,17 @@ export interface User {
   unlockedHats: { name: string, unlocked: boolean }[]
   unlockedSuits: { name: string, unlocked: boolean }[]
   time: number
+}
+
+export interface Status {
+  online: boolean
+  playing: string
+  mode: string
+  map: string
+}
+
+export interface NameChange {
+  name: string
+  changedToAt: number
+  changedToAt_latest?: number
 }

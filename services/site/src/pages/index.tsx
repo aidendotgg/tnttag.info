@@ -36,7 +36,7 @@ export default function Home() {
           </div>
         </div>
         <div className="absolute bottom-0 right-2 text-right text-sm">
-          <p className='text-minecraft-white'>
+          <p className="text-minecraft-white">
             Website made with ❤ by{' '}
             <a className="text-minecraft-red hover:text-blue-700 hover:underline duration-300" href="https://aiden.gg" target="_blank">
               Aiden

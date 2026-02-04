@@ -1,7 +1,7 @@
 import Elysia, { t } from "elysia";
 import { ip } from "elysia-ip";
 import { normalizeUUID } from "@tnttag/formatting";
-import { User, Status } from "@tnttag/interfaces";
+import { User, Status, NameChange } from "@tnttag/interfaces";
 import { tntFetch } from "@tnttag/fetch";
 import { getStats } from "../utils/StatsUtils";
 import { RedisJSON } from "redis";
@@ -107,6 +107,44 @@ export const UserRouter = new Elysia({ prefix: "/user" })
 		})
 	})
 
+	.post('/names', async ({ body, status }) => {
+		let { _id } = body as { _id: string }
+
+		let uuid = normalizeUUID(_id)
+
+		let cache = await db.redis.json.GET(`tntuser:names:${uuid}`) as NameChange[]
+
+		if (cache) {
+			return status(200, {
+				success: true,
+				names: cache
+			})
+		}
+
+		let nameReq = await tntFetch(`https://api.antisniper.net/v2/mojang?key=${process.env.ANTISNIPER_API_KEY}&uuid=${_id}`)
+
+		if (!nameReq.res?.ok || !nameReq.data) {
+			return status(500, {
+				success: false,
+				error: "Failed to fetch name data"
+			})
+		}
+
+		let dedupedNames: NameChange[] = nameReq.data.name_changes.filter((item, i, arr) => i === 0 || item.name !== arr[i - 1].name)
+
+		await db.redis.json.SET(`tntuser:names:${uuid}`, '.', dedupedNames as unknown as RedisJSON)
+		await db.redis.expire(`tntuser:names:${uuid}`, 3600)
+
+		return status(200, {
+			success: true,
+			names: dedupedNames
+		})
+	}, {
+		body: t.Object({
+			_id: t.String()
+		})
+	})
+
 	.get('/leaderboard', async ({ status }) => {
 		let cache = await db.redis.json.GET('tntuser:leaderboards') as {
 			winsLeaderboard: User[],
@@ -184,28 +222,6 @@ export const UserRouter = new Elysia({ prefix: "/user" })
 		return status(200, {
 			success: true,
 			count: userCount
-		})
-	})
-
-	.post('/names', async ({ body, status }) => {
-		let { _id } = body as { _id: string }
-
-		let nameReq = await tntFetch(`https://api.antisniper.net/v2/mojang?key=${process.env.ANTISNIPER_API_KEY}&uuid=${_id}`)
-
-		if (!nameReq.res?.ok || !nameReq.data) {
-			return status(500, {
-				success: false,
-				error: "Failed to fetch name data"
-			})
-		}
-
-		return status(200, {
-			success: true,
-			names: nameReq.data.name_changes
-		})
-	}, {
-		body: t.Object({
-			_id: t.String()
 		})
 	})
 
