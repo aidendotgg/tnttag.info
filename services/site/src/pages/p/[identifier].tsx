@@ -144,7 +144,7 @@ export default function Username() {
                 <Wins wins={data.fromValue} />
               </p>
             )}
-            <div className={`flex min-[400px]:w-50 w-31.25 rounded-md bg-neutral-700 h-3`}>
+            <div className={`flex min-[420px]:w-50 max-w-50 w-full rounded-md bg-neutral-700 h-3`}>
               <div
                 style={{
                   width: `${progress}%`,
@@ -181,7 +181,7 @@ export default function Username() {
                   <div className="flex min-[1270px]:flex-row flex-col gap-2">
                     <div className="flex flex-col gap-2 h-full">
                       <div className="flex min-[830px]:flex-row flex-col gap-2">
-                        <div className="flex min-[830px]:w-fit w-full h-full flex-col items-center rounded-md bg-neutral-950/80 p-4 border-1 border-neutral-950">
+                        <div className="flex min-[830px]:w-fit w-full flex-col items-center rounded-md bg-neutral-950/80 p-4 border-1 border-neutral-950">
                           <h1 className="min-[440px]:text-3xl text-2xl text-center">
                             <Rank username={user!.username} rank={user!.rank} rankColor={user!.rankColor} plusColor={user!.plusColor} />
                           </h1>
