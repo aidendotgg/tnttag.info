@@ -27,27 +27,27 @@ export default function Navbar() {
                   Tag.info
                 </h1>
               </div>
-              <nav className="min-[900px]:flex hidden justify-center absolute w-full">
-                <ul className="flex flex-row gap-6">
+              <nav className="min-[1050px]:flex hidden justify-center absolute w-full">
+                <ul className="flex flex-row gap-1 items-center">
                   <li className="flex">
-                    <button className="text-minecraft-white text-xl" onClick={() => router.push('/leaderboard')}>
+                    <button className="text-minecraft-white text-xl hover:bg-neutral-800 duration-300 rounded-md px-2.5 py-1" onClick={() => router.push('/leaderboard')}>
                       Leaderboard
                     </button>
                   </li>
                   <li className="flex">
-                    <a className="text-minecraft-white text-xl" href="https://github.com/aidendotgg/tnttagutilities" target="_blank">
+                    <a className="text-minecraft-white text-xl hover:bg-neutral-800 duration-300 rounded-md px-2.5 py-1" href="https://github.com/aidendotgg/tnttagutilities" target="_blank">
                       Proxy Mod
                     </a>
                   </li>
                   <li className="flex">
-                    <a className="text-minecraft-white text-xl" href="https://github.com/aidendotgg/tnttag.info" target="_blank">
+                    <a className="text-minecraft-white text-xl hover:bg-neutral-800 duration-300 rounded-md px-2.5 py-1" href="https://github.com/aidendotgg/tnttag.info" target="_blank">
                       GitHub
                     </a>
                   </li>
                 </ul>
               </nav>
             </div>
-            <div className="min-[900px]:hidden flex pr-4 py-0.5">
+            <div className="min-[1050px]:hidden flex pr-4 py-0.5">
               <button onClick={handleDropdown} className="flex">
                 {showDropdown ? (
                   <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" className="h-10 w-10 fill-white" viewBox="0 0 16 16">

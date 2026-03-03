@@ -14,7 +14,7 @@ export default function Username() {
   const { identifier } = router.query as { identifier: string };
 
   const [loading, setLoading] = useState(true);
-  const [skinFetched, setSkinFetched] = useState(false);
+  const [namesLoading, setNamesLoading] = useState(true);
   const [user, setUser] = useState<User>();
   const [status, setStatus] = useState<Status>();
   const [names, setNames] = useState<NameChange[]>();
@@ -57,9 +57,17 @@ export default function Username() {
         }
       }
 
+      setLoading(false);
+    }
+
+    if (identifier) fetchPlayer();
+  }, [identifier]);
+
+  useEffect(() => {
+    async function fetchNames() {
       const nameReq = await tntFetch(`${process.env.BACKEND_URL}/user/names`, {
         method: 'POST',
-        body: JSON.stringify({ _id: userReq.data._id }),
+        body: JSON.stringify({ _id: user?._id }),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -69,11 +77,11 @@ export default function Username() {
         setNames(nameReq.data.names.reverse());
       }
 
-      setLoading(false);
+      setNamesLoading(false);
     }
 
-    if (identifier && !user) fetchPlayer();
-  }, [identifier]);
+    if (user) fetchNames();
+  }, [user]);
 
   useEffect(() => {
     async function fetchSkin() {
@@ -91,7 +99,6 @@ export default function Username() {
       const capesReq = await tntFetch(`https://api.capes.dev/load/${user?.username}`);
 
       if (!capesReq.res?.ok || !capesReq.data) {
-        setSkinFetched(true);
         return;
       }
 
@@ -100,11 +107,9 @@ export default function Username() {
       } else if (capesReq.data.optifine.imageUrl) {
         skinViewer.loadCape(capesReq.data.optifine.imageUrl);
       }
-
-      setSkinFetched(true);
     }
 
-    if (user && !skinFetched && !loading) fetchSkin();
+    if (user && !loading) fetchSkin();
   }, [user, loading]);
 
   function formatWinMilestone(wins: number) {
@@ -185,9 +190,9 @@ export default function Username() {
                           <h1 className="min-[440px]:text-3xl text-2xl text-center">
                             <Rank username={user!.username} rank={user!.rank} rankColor={user!.rankColor} plusColor={user!.plusColor} />
                           </h1>
-                          <canvas id="skin_container" className="hover:cursor-pointer active:cursor-move" />
+                          <canvas id="skin_container" className="hover:cursor-pointer active:cursor-move w-[250px]" />
                         </div>
-                        <div className="flex min-[830px]:w-fit w-full h-full flex-col rounded-md bg-neutral-950/80 p-4 border-1 border-neutral-950">
+                        <div className="flex w-full h-full flex-col rounded-md bg-neutral-950/80 p-4 border-1 border-neutral-950">
                           <div className="flex flex-col whitespace-nowrap">
                             <h1 className="font-bold text-2xl mb-1 text-center text-minecraft-white text-nowrap">Game Statistics</h1>
                             <div className="flex flex-col">
@@ -225,7 +230,7 @@ export default function Username() {
                           </div>
                         </div>
                       </div>
-                      <div className="flex min-[667px]:flex-row flex-col gap-2">
+                      <div className="flex min-[667px]:flex-row flex-col gap-2 h-full">
                         <div className="flex w-full flex-col rounded-md bg-neutral-950/80 p-4 border-1 border-neutral-950">
                           <h1 className="font-bold text-2xl mb-1 text-center text-minecraft-white text-nowrap">Player Info</h1>
                           <div className="flex flex-col whitespace-nowrap">
@@ -330,22 +335,30 @@ export default function Username() {
                         </div>
                         <div className="flex w-full flex-col rounded-md bg-neutral-950/80 p-4 border-1 border-neutral-950">
                           <h1 className="font-bold text-2xl mb-1 text-center text-minecraft-white text-nowrap">Name History</h1>
-                          {!names ? (
-                            <p className="text-center text-minecraft-white">No previous names found.</p>
+                          {namesLoading ? (
+                            <div className='flex flex-col h-full justify-center'>
+                              <p className="text-center animate-bounce text-2xl text-minecraft-white">Loading...</p>
+                            </div>
                           ) : (
-                            <ol className="flex flex-col h-54 overflow-y-auto overflow-x-hidden">
-                              {names.map((name, index) => (
-                                <li
-                                  key={index}
-                                  className={`flex w-full min-[400px]:flex-row flex-col justify-between min-[400px]:gap-8 gap-0 rounded-md bg-neutral-900 p-2 border-1 border-neutral-800 mb-1`}
-                                >
-                                  <p className="font-bold text-minecraft-white text-nowrap">{name.name}</p>
-                                  <p className="font-normal text-minecraft-gray">
-                                    ({index + 1 === names.length ? 'First Name' : new Date(name.changedToAt ? name.changedToAt : name.changedToAt_latest!).toLocaleDateString()})
-                                  </p>
-                                </li>
-                              ))}
-                            </ol>
+                            <>
+                              {!names ? (
+                                <p className="text-center text-minecraft-white">No previous names found.</p>
+                              ) : (
+                                <ol className="flex flex-col h-54 overflow-y-auto overflow-x-hidden">
+                                  {names.map((name, index) => (
+                                    <li
+                                      key={index}
+                                      className={`flex w-full min-[400px]:flex-row flex-col justify-between min-[400px]:gap-8 gap-0 rounded-md bg-neutral-900 p-2 border-1 border-neutral-800 mb-1`}
+                                    >
+                                      <p className="font-bold text-minecraft-white text-nowrap">{name.name}</p>
+                                      <p className="font-normal text-minecraft-gray text-nowrap">
+                                        ({index + 1 === names.length ? 'First Name' : new Date(name.changedToAt ? name.changedToAt : name.changedToAt_latest!).toLocaleDateString()})
+                                      </p>
+                                    </li>
+                                  ))}
+                                </ol>
+                              )}
+                            </>
                           )}
                         </div>
                       </div>

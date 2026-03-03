@@ -55,7 +55,7 @@ export default function PlayerSearch() {
   }, [identifier, autoComplete, highlightIndex]);
 
   return (
-    <div className="flex flex-row gap-2 items-center mb-1 w-full justify-center">
+    <div className="flex flex-row gap-2 items-center w-full justify-center">
       <div className="flex flex-col relative w-full gap-2">
         <input
           id="player"
