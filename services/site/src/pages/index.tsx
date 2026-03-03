@@ -30,7 +30,7 @@ export default function Home() {
               Tag.info
             </h1>
             <div className="h-fit w-full rounded-md bg-neutral-950/80 p-4 border-1 border-neutral-950">
-              <h1 className='text-2xl pb-2 font-bold text-center w-full text-minecraft-white'>Search Player</h1>
+              <h1 className="text-2xl pb-2 font-bold text-center w-full text-minecraft-white">Search Player</h1>
               <PlayerSearch />
             </div>
           </div>
