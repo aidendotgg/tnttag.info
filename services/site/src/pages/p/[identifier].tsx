@@ -342,7 +342,9 @@ export default function Username() {
                           ) : (
                             <>
                               {!names ? (
-                                <p className="text-center text-minecraft-white">No previous names found.</p>
+                                <div className="flex h-54">
+                                  <p className="text-center text-2xl text-minecraft-white">No previous names found.</p>
+                                </div>
                               ) : (
                                 <ol className="flex flex-col h-54 overflow-y-auto overflow-x-hidden">
                                   {names.map((name, index) => (
