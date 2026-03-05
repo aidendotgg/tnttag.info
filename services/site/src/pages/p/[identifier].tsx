@@ -336,7 +336,7 @@ export default function Username() {
                         <div className="flex w-full flex-col rounded-md bg-neutral-950/80 p-4 border-1 border-neutral-950">
                           <h1 className="font-bold text-2xl mb-1 text-center text-minecraft-white text-nowrap">Name History</h1>
                           {namesLoading ? (
-                            <div className="flex flex-col h-full justify-center">
+                            <div className="flex flex-col h-54 justify-center">
                               <p className="text-center animate-bounce text-2xl text-minecraft-white">Loading...</p>
                             </div>
                           ) : (
