@@ -16,7 +16,7 @@ export async function getStats(uuid: string): Promise<User | null> {
     let playerReq = await tntFetch(`https://api.hypixel.net/v2/player?key=${process.env.HYPIXEL_API_KEY}&uuid=${uuid}`)
 
     if (!playerReq.res?.ok || !playerReq.data) {
-        console.log(`Failed to fetch hypixel player data: ${playerReq.res}`);
+        console.log(`Failed to fetch hypixel player data: ${playerReq.res.status} ${playerReq.res.statusText}`);
         return null
     }
 
