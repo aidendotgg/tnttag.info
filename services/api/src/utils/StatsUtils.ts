@@ -171,7 +171,7 @@ export async function getStats(uuid: string): Promise<User | null> {
     }
 
     await db.redis.json.SET(`tntuser:${uuid}`, '.', player as unknown as RedisJSON)
-    await db.redis.expire(`tntuser:${uuid}`, 300)
+    await db.redis.expire(`tntuser:${uuid}`, 600)
 
     await db.mongo.userCol.findOneAndReplace({ _id: uuid }, player, { upsert: true })
     return player
