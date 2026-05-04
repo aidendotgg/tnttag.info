@@ -232,6 +232,7 @@ export const UserRouter = new Elysia({ prefix: "/user" })
 				return {
 					uuid: uuid,
 					wins: player.wins,
+					rank: player.rank,
 					plusColor: player.plusColor,
 					rankColor: player.rankColor,
 					tag: blacklistInfo
@@ -239,7 +240,8 @@ export const UserRouter = new Elysia({ prefix: "/user" })
 			} else {
 				return { 
 					uuid: uuid, 
-					wins: 0, 
+					wins: 0,
+					rank: null,
 					plusColor: null, 
 					rankColor: null, 
 					tag: blacklistInfo 
