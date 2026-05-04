@@ -190,7 +190,7 @@ export async function getSeraph(uuid: string): Promise<BlacklistTag | null> {
     })
 
     if (!seraphReq.res?.ok || !seraphReq.data) {
-        console.log(`Failed to fetch seraph player data: ${seraphReq}`);
+        console.log(`Failed to fetch seraph player data: ${JSON.stringify(seraphReq)}`);
         return null
     }
 
@@ -220,15 +220,15 @@ export async function getUrchin(uuid: string): Promise<BlacklistTag | null> {
     })
 
     if (!urchinReq.res?.ok || !urchinReq.data) {
-        console.log(`Failed to fetch urchin player data: ${urchinReq}`);
+        console.log(`Failed to fetch urchin player data: ${JSON.stringify(urchinReq)}`);
         return null
     }
 
-    if (urchinReq.data.tags?.length === 0) return null
+    if (urchinReq.data.tags.length === 0) return null
 
     let blacklistInfo: BlacklistTag = {
-        message: urchinReq.data.tags[0]?.reason,
-        reason: formatUrchinType(urchinReq.data.tags[0]?.type),
+        message: urchinReq.data.tags[0]!.reason,
+        reason: formatUrchinType(urchinReq.data.tags[0]!.type),
         verified: true
     }
 
@@ -242,7 +242,7 @@ export async function updateLeaderboards() {
     let leaderboardReq = await tntFetch(`https://api.hypixel.net/v2/leaderboards?key=${process.env.HYPIXEL_API_KEY}`)
 
     if (!leaderboardReq.res?.ok || !leaderboardReq.data) {
-        console.log(`Failed to fetch hypixel leaderboard data: ${leaderboardReq}`);
+        console.log(`Failed to fetch hypixel leaderboard data: ${JSON.stringify(leaderboardReq)}`);
         return
     }
 
