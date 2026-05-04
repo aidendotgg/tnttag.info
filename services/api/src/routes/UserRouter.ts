@@ -6,9 +6,21 @@ import { getSeraph, getStats, getUrchin } from "../utils/StatsUtils";
 import type { RedisJSON } from "redis";
 import { mongo, redis } from "../utils/DatabaseUtils";
 import { UUIDPlugin } from "../plugins/UUIDPlugin";
+import { rateLimit, type Generator } from "elysia-rate-limit";
+import { ip } from "elysia-ip";
+
+const keyGenerator: Generator<{ ip: string }> = async (req, server, { ip }) => {
+    return Bun.hash(JSON.stringify(ip)).toString();
+};
 
 export const UserRouter = new Elysia({ prefix: "/user" })
 	.use(UUIDPlugin())
+	.use(ip())
+	.use(rateLimit({
+		duration: 15000,
+		max: 45,
+		generator: keyGenerator,
+	}))
 	.post('/', async ({ uuid }) => {
 		let player = await getStats(uuid)
 
