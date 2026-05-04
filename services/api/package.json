@@ -5,20 +5,19 @@
     "start": "bun run src/index.ts"
   },
   "dependencies": {
-    "@elysiajs/cors": "^1.4.0",
+    "@elysiajs/cors": "^1.4.2",
     "@tnttag/fetch": "workspace:*",
     "@tnttag/formatting": "workspace:*",
-    "@tnttag/interfaces": "workspace:*",
-    "elysia": "^1.4.19",
-    "elysia-helmet": "^3.0.0",
-    "elysia-ip": "^1.0.10",
-    "elysia-rate-limit": "^4.4.2",
-    "mongodb": "^7.0.0",
-    "redis": "^5.10.0",
-    "uuid": "^13.0.0"
+    "@tnttag/types": "workspace:*",
+    "elysia": "^1.4.28",
+    "elysia-helmet": "^3.1.0",
+    "elysia-rate-limit": "^4.6.1",
+    "mongodb": "^7.2.0",
+    "redis": "^5.12.1",
+    "uuid": "^13.0.1"
   },
   "devDependencies": {
-    "bun-types": "^1.3.5"
+    "bun-types": "^1.3.13"
   },
   "module": "src/index.js"
 }

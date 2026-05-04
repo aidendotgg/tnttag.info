@@ -1,4 +1,4 @@
-export function getColor(color: string, defaultColor: string) {
+export function getColor(color: string, defaultColor: string): string {
     const colorMap = new Map<string, string>([
         ["RED", "#FF5555"],
         ["GOLD", "#FFAA00"],
@@ -18,17 +18,16 @@ export function getColor(color: string, defaultColor: string) {
         ["DARK_BLUE", "#0000AA"],
     ]);
 
-    if (!color) return defaultColor
-    return colorMap.get(color.toUpperCase());
+    return colorMap.get(color.toUpperCase()) ?? defaultColor;
 }
 
-export function getRank(player: any) {
+export function getRank(player: any): string {
     let rank = player.newPackageRank ?? player.packageRank ?? "NONE"
 
     if (player.newPackageRank === "MVP_PLUS" && player.monthlyPackageRank === "SUPERSTAR") {
         rank = "MVP_PLUS_PLUS"
     }
-    
+
     switch (player.rank) {
         case "YOUTUBER":
             rank = "YOUTUBER"
@@ -79,6 +78,20 @@ export function formatCosmetic(cosmetic: string) {
     } else {
         return cosmetic.split("_").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(" ")
     }
+}
+
+export function formatSeraphTooltip(reason: string) {
+    let editedReason = reason
+
+    if (editedReason.includes(": ")) {
+        editedReason = editedReason.split(": ")[1]!
+    }
+
+    if (editedReason.includes(" ( ")) {
+        editedReason = editedReason.split(" ( ")[0]!
+    }
+
+    return editedReason
 }
 
 export const particles = [

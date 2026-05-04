@@ -1,5 +1,5 @@
 import { tntFetch } from '@tnttag/fetch';
-import { User } from '@tnttag/interfaces';
+import { User } from '@tnttag/types';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 

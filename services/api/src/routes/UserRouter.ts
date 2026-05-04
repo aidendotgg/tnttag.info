@@ -1,40 +1,15 @@
-import Elysia, { t } from "elysia";
-import { ip } from "elysia-ip";
+import { Elysia, t, status } from "elysia";
 import { normalizeUUID } from "@tnttag/formatting";
-import { User, Status, NameChange } from "@tnttag/interfaces";
+import type { User, Status, NameChange } from "@tnttag/types";
 import { tntFetch } from "@tnttag/fetch";
-import { getStats } from "../utils/StatsUtils";
-import { RedisJSON } from "redis";
-import { db } from "..";
+import { getSeraph, getStats } from "../utils/StatsUtils";
+import type { RedisJSON } from "redis";
+import { mongo, redis } from "../utils/DatabaseUtils";
+import { UUIDPlugin } from "../plugins/UUIDPlugin";
 
 export const UserRouter = new Elysia({ prefix: "/user" })
-	.use(ip())
-
-	.post('/', async ({ body, status }) => {
-		let { username, _id } = body as { username?: string; _id?: string }
-
-		let uuid: any
-		if (_id) {
-			uuid = normalizeUUID(_id)
-		} else if (username) {
-			let uuidReq = await tntFetch(`https://playerdb.co/api/player/minecraft/${username}`, { headers: { "User-Agent": "TNTTag.info (+https://tnttag.info)" } })
-
-			if (!uuidReq.res?.ok || !uuidReq.data) {
-				return status(404, {
-					success: false,
-					error: "Player not found",
-					code: 1
-				})
-			}
-
-			uuid = normalizeUUID(uuidReq.data.data.player.id)
-		} else {
-			return status(400, {
-				success: false,
-				error: "No username or uuid provided"
-			})
-		}
-
+	.use(UUIDPlugin())
+	.post('/', async ({ uuid }) => {
 		let player = await getStats(uuid)
 
 		if (!player) {
@@ -45,29 +20,26 @@ export const UserRouter = new Elysia({ prefix: "/user" })
 			})
 		}
 
-		return status(200, {
+		return {
 			success: true,
 			...player
-		})
+		}
 	}, {
 		body: t.Object({
 			username: t.Optional(t.String({ format: 'regex', pattern: '^[a-zA-Z0-9_]*$', maxLength: 16, minLength: 2 })),
 			_id: t.Optional(t.String())
-		})
+		}),
+		normalizeUUID: true
 	})
 
-	.post('/status', async ({ body, status }) => {
-		let { _id } = body as { _id: string }
-
-		let uuid = normalizeUUID(_id)
-
-		let cache = await db.redis.json.GET(`tntuser:status:${uuid}`) as Status
+	.post('/status', async ({ uuid }) => {
+		let cache = await redis.json.GET(`tntuser:status:${uuid}`) as Status
 
 		if (cache) {
-			return status(200, {
+			return {
 				success: true,
 				...cache
-			})
+			}
 		}
 
 		let statusReq = await tntFetch(`https://api.hypixel.net/v2/status?key=${process.env.HYPIXEL_API_KEY}&uuid=${uuid}`)
@@ -94,34 +66,31 @@ export const UserRouter = new Elysia({ prefix: "/user" })
 			map
 		}
 
-		await db.redis.json.SET(`tntuser:status:${uuid}`, '.', statusInfo as unknown as RedisJSON)
-		await db.redis.expire(`tntuser:status:${uuid}`, 180)
+		await redis.json.SET(`tntuser:status:${uuid}`, '.', statusInfo as unknown as RedisJSON)
+		await redis.expire(`tntuser:status:${uuid}`, 180)
 
-		return status(200, {
+		return {
 			success: true,
 			...statusInfo
-		})
+		}
 	}, {
 		body: t.Object({
 			_id: t.String()
-		})
+		}),
+		normalizeUUID: true
 	})
 
-	.post('/names', async ({ body, status }) => {
-		let { _id } = body as { _id: string }
-
-		let uuid = normalizeUUID(_id)
-
-		let cache = await db.redis.json.GET(`tntuser:names:${uuid}`) as NameChange[]
+	.post('/names', async ({ uuid }) => {
+		let cache = await redis.json.GET(`tntuser:names:${uuid}`) as NameChange[]
 
 		if (cache) {
-			return status(200, {
+			return {
 				success: true,
 				names: cache
-			})
+			}
 		}
 
-		let nameReq = await tntFetch(`https://api.antisniper.net/v2/mojang?key=${process.env.ANTISNIPER_API_KEY}&uuid=${_id}`)
+		let nameReq = await tntFetch(`https://api.antisniper.net/v2/mojang?key=${process.env.ANTISNIPER_API_KEY}&uuid=${uuid}`)
 
 		if (!nameReq.res?.ok || !nameReq.data) {
 			return status(500, {
@@ -130,23 +99,45 @@ export const UserRouter = new Elysia({ prefix: "/user" })
 			})
 		}
 
-		let dedupedNames: NameChange[] = nameReq.data.name_changes.filter((item, i, arr) => i === 0 || item.name !== arr[i - 1].name)
+		let dedupedNames: NameChange[] = nameReq.data.name_changes.filter((item: NameChange, i: number, arr: NameChange[]) => i === 0 || item.name !== arr[i - 1]!.name)
 
-		await db.redis.json.SET(`tntuser:names:${uuid}`, '.', dedupedNames as unknown as RedisJSON)
-		await db.redis.expire(`tntuser:names:${uuid}`, 3600)
+		await redis.json.SET(`tntuser:names:${uuid}`, '.', dedupedNames as unknown as RedisJSON)
+		await redis.expire(`tntuser:names:${uuid}`, 3600)
 
-		return status(200, {
+		return {
 			success: true,
 			names: dedupedNames
-		})
+		}
 	}, {
 		body: t.Object({
 			_id: t.String()
-		})
+		}),
+		normalizeUUID: true
 	})
 
-	.get('/leaderboard', async ({ status }) => {
-		let cache = await db.redis.json.GET('tntuser:leaderboards') as {
+	.post('/seraph', async ({ uuid }) => {
+		let blacklistInfo = await getSeraph(uuid)
+
+		if (!blacklistInfo) {
+			return status(404, {
+				success: false,
+				error: "Player not found or not blacklisted"
+			})
+		}
+
+		return {
+			success: true,
+			tag: blacklistInfo,
+		}
+	}, {
+		body: t.Object({
+			_id: t.String()
+		}),
+		normalizeUUID: true
+	})
+
+	.get('/leaderboard', async () => {
+		let cache = await redis.json.GET('tntuser:leaderboards') as {
 			winsLeaderboard: User[],
 			killsLeaderboard: User[],
 			deathsLeaderboard: User[],
@@ -155,18 +146,18 @@ export const UserRouter = new Elysia({ prefix: "/user" })
 		}
 
 		if (cache) {
-			return status(200, {
+			return {
 				success: true,
 				...cache
-			})
+			}
 		}
 
 		const [winsLeaderboard, killsLeaderboard, deathsLeaderboard, powerupsLeaderboard, tagsLeaderboard] = await Promise.all([
-			db.mongo.userCol.find({}, { projection: { _id: 1, username: 1, wins: 1, rank: 1, rankColor: 1, plusColor: 1 } }).sort({ wins: -1 }).limit(1000).toArray(),
-			db.mongo.userCol.find({}, { projection: { _id: 1, username: 1, kills: 1, wins: 1, rank: 1, rankColor: 1, plusColor: 1 } }).sort({ kills: -1 }).limit(1000).toArray(),
-			db.mongo.userCol.find({}, { projection: { _id: 1, username: 1, deaths: 1, wins: 1, rank: 1, rankColor: 1, plusColor: 1 } }).sort({ deaths: -1 }).limit(1000).toArray(),
-			db.mongo.userCol.find({}, { projection: { _id: 1, username: 1, powerups: 1, wins: 1, rank: 1, rankColor: 1, plusColor: 1 } }).sort({ powerups: -1 }).limit(1000).toArray(),
-			db.mongo.userCol.find({}, { projection: { _id: 1, username: 1, tags: 1, wins: 1, rank: 1, rankColor: 1, plusColor: 1 } }).sort({ tags: -1 }).limit(1000).toArray()
+			mongo.userCol.find({}, { projection: { _id: 1, username: 1, wins: 1, rank: 1, rankColor: 1, plusColor: 1 } }).sort({ wins: -1 }).limit(1000).toArray(),
+			mongo.userCol.find({}, { projection: { _id: 1, username: 1, kills: 1, wins: 1, rank: 1, rankColor: 1, plusColor: 1 } }).sort({ kills: -1 }).limit(1000).toArray(),
+			mongo.userCol.find({}, { projection: { _id: 1, username: 1, deaths: 1, wins: 1, rank: 1, rankColor: 1, plusColor: 1 } }).sort({ deaths: -1 }).limit(1000).toArray(),
+			mongo.userCol.find({}, { projection: { _id: 1, username: 1, powerups: 1, wins: 1, rank: 1, rankColor: 1, plusColor: 1 } }).sort({ powerups: -1 }).limit(1000).toArray(),
+			mongo.userCol.find({}, { projection: { _id: 1, username: 1, tags: 1, wins: 1, rank: 1, rankColor: 1, plusColor: 1 } }).sort({ tags: -1 }).limit(1000).toArray()
 		]);
 
 		let leaderboards = {
@@ -177,56 +168,56 @@ export const UserRouter = new Elysia({ prefix: "/user" })
 			tagsLeaderboard
 		}
 
-		await db.redis.json.SET('tntuser:leaderboards', '.', leaderboards as unknown as RedisJSON)
-		await db.redis.expire('tntuser:leaderboards', 300)
+		await redis.json.SET('tntuser:leaderboards', '.', leaderboards as unknown as RedisJSON)
+		await redis.expire('tntuser:leaderboards', 300)
 
-		return status(200, {
+		return {
 			success: true,
 			...leaderboards
-		})
+		}
 	})
 
-	.get('/autocomplete', async ({ query, status }) => {
-		let { name } = query
+	.get('/autocomplete', async ({ query }) => {
+		const { name } = query
 
-		let players = await db.mongo.userCol.find({
+		let players = await mongo.userCol.find({
 			normalizedUsername: { $regex: `^${name.toLocaleLowerCase()}` }
 		}, { projection: { _id: 1, username: 1 } }).sort({ wins: -1 }).toArray()
 
 		players.sort((a, b) => a.username.toUpperCase() == name.toUpperCase() ? -1 : b.username.toUpperCase() == name.toUpperCase() ? 1 : 0)
 
-		return status(200, {
+		return {
 			success: true,
 			players
-		})
+		}
 	}, {
 		query: t.Object({
 			name: t.String()
 		})
 	})
 
-	.get(`/count`, async ({ status }) => {
-		let cache = await db.redis.get(`tntuser:count`) as string
+	.get(`/count`, async () => {
+		let cache = await redis.get(`tntuser:count`) as string
 
 		if (cache) {
-			return status(200, {
+			return {
 				success: true,
 				count: parseInt(cache),
-			})
+			}
 		}
 
-		const userCount = await db.mongo.userCol.countDocuments()
+		const userCount = await mongo.userCol.countDocuments()
 
-		await db.redis.set(`tntuser:count`, userCount.toString(), { EX: 300 })
+		await redis.set(`tntuser:count`, userCount.toString(), { EX: 300 })
 
-		return status(200, {
+		return {
 			success: true,
 			count: userCount
-		})
+		}
 	})
 
-	.post('/multiple', async ({ body, status }) => {
-		let { _id } = body as { _id: string[] }
+	.post('/multiple', async ({ body }) => {
+		const { _id } = body
 
 		let uuidList = []
 		for (const uuid of _id) {
@@ -235,20 +226,21 @@ export const UserRouter = new Elysia({ prefix: "/user" })
 
 		const requests = uuidList.map(async (uuid) => {
 			let player = await getStats(uuid)
+			let blacklistInfo = await getSeraph(uuid)
 
 			if (player) {
-				return { uuid: uuid, wins: player.wins }
+				return { uuid: uuid, wins: player.wins, tag: blacklistInfo }
 			} else {
-				return { uuid: uuid, wins: 0 }
+				return { uuid: uuid, wins: 0, tag: blacklistInfo }
 			}
 		})
 
 		let response = await Promise.all(requests);
 
-		return status(200, {
+		return {
 			success: true,
 			users: response
-		})
+		}
 	}, {
 		body: t.Object({
 			_id: t.Array(t.String(), { maxItems: 36 })

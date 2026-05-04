@@ -1,7 +1,7 @@
-import { User } from "@tnttag/interfaces"
-import { deathEffects, getColor, getRank, hats, particles, suits } from "@tnttag/formatting"
-import { RedisJSON } from "redis"
-import { db } from ".."
+import type { BlacklistTag, User } from "../../../../libraries/types"
+import { deathEffects, formatSeraphTooltip, getColor, getRank, hats, particles, suits } from "@tnttag/formatting"
+import type { RedisJSON } from "redis"
+import { mongo, redis } from "./DatabaseUtils"
 import { tntFetch } from "@tnttag/fetch";
 
 function sleep(ms: number): Promise<void> {
@@ -9,14 +9,14 @@ function sleep(ms: number): Promise<void> {
 }
 
 export async function getStats(uuid: string): Promise<User | null> {
-    let cache = await db.redis.json.GET(`tntuser:${uuid}`) as User
+    let cache = await redis.json.GET(`tntuser:${uuid}`) as User
 
     if (cache) return cache
 
     let playerReq = await tntFetch(`https://api.hypixel.net/v2/player?key=${process.env.HYPIXEL_API_KEY}&uuid=${uuid}`)
 
     if (!playerReq.res?.ok || !playerReq.data) {
-        console.log(`Failed to fetch hypixel player data: ${playerReq.res.status} ${playerReq.res.statusText}`);
+        console.log(`Failed to fetch hypixel player data: ${playerReq.res?.status} ${playerReq.res?.statusText}`);
         return null
     }
 
@@ -55,14 +55,14 @@ export async function getStats(uuid: string): Promise<User | null> {
         kd = kills
     }
     let tags = playerData.achievements?.tntgames_clinic ?? 0
-    let playtime
+    let playtime = 0
     if (!playerData.achievements) {
         playtime = 0
     } else if (!playerData.achievements?.tntgames_tnt_triathlon) {
         playtime = 0
     } else {
         let unroundedPlaytime = playerData.achievements?.tntgames_tnt_triathlon / 60
-        playtime = unroundedPlaytime.toFixed(2)
+        playtime = parseFloat(unroundedPlaytime.toFixed(2))
     }
     let powerups = playerData.achievements?.tntgames_the_upper_hand ?? 0
     let prefixColor = playerData.stats?.TNTGames?.prefix_tntag ?? "dark_gray"
@@ -107,11 +107,11 @@ export async function getStats(uuid: string): Promise<User | null> {
     }
 
     const [winsLeaderboard, killsLeaderboard, deathsLeaderboard, powerupsLeaderboard, tagsLeaderboard] = await Promise.all([
-        db.mongo.userCol.find({}, { projection: { _id: 1 } }).sort({ wins: -1 }).limit(100).toArray(),
-        db.mongo.userCol.find({}, { projection: { _id: 1 } }).sort({ kills: -1 }).limit(100).toArray(),
-        db.mongo.userCol.find({}, { projection: { _id: 1 } }).sort({ deaths: -1 }).limit(100).toArray(),
-        db.mongo.userCol.find({}, { projection: { _id: 1 } }).sort({ powerups: -1 }).limit(100).toArray(),
-        db.mongo.userCol.find({}, { projection: { _id: 1 } }).sort({ tags: -1 }).limit(100).toArray()
+        mongo.userCol.find({}, { projection: { _id: 1 } }).sort({ wins: -1 }).limit(100).toArray(),
+        mongo.userCol.find({}, { projection: { _id: 1 } }).sort({ kills: -1 }).limit(100).toArray(),
+        mongo.userCol.find({}, { projection: { _id: 1 } }).sort({ deaths: -1 }).limit(100).toArray(),
+        mongo.userCol.find({}, { projection: { _id: 1 } }).sort({ powerups: -1 }).limit(100).toArray(),
+        mongo.userCol.find({}, { projection: { _id: 1 } }).sort({ tags: -1 }).limit(100).toArray()
     ]);
 
     const winsRank = winsLeaderboard.findIndex(p => p._id === uuid) + 1;
@@ -170,11 +170,42 @@ export async function getStats(uuid: string): Promise<User | null> {
         time: Date.now()
     }
 
-    await db.redis.json.SET(`tntuser:${uuid}`, '.', player as unknown as RedisJSON)
-    await db.redis.expire(`tntuser:${uuid}`, 600)
+    await redis.json.SET(`tntuser:${uuid}`, '.', player as unknown as RedisJSON)
+    await redis.expire(`tntuser:${uuid}`, 600)
 
-    await db.mongo.userCol.findOneAndReplace({ _id: uuid }, player, { upsert: true })
+    await mongo.userCol.findOneAndReplace({ _id: uuid }, player, { upsert: true })
     return player
+}
+
+export async function getSeraph(uuid: string): Promise<BlacklistTag | null> {
+    let cache = await redis.json.GET(`tntuser:seraph:${uuid}`) as BlacklistTag
+
+    if (cache) return cache
+
+    let seraphReq = await tntFetch(`http://api.seraph.si/${uuid}/blacklist`, {
+        headers: {
+            "User-Agent": "TNTTag.info (+https://tnttag.info)",
+            "seraph-api-key": process.env.SERAPH_API_KEY!
+        }
+    })
+
+    if (!seraphReq.res?.ok || !seraphReq.data) {
+        console.log(`Failed to fetch seraph player data: ${seraphReq}`);
+        return null
+    }
+
+    if (!seraphReq.data.data.blacklist.tagged) return null
+
+    let blacklistInfo: BlacklistTag = {
+        message: formatSeraphTooltip(seraphReq.data.data.blacklist.tooltip),
+        reason: seraphReq.data.data.blacklist.report_type ?? "Unknown",
+        verified: seraphReq.data.data.blacklist.verified ?? false
+    }
+
+    await redis.json.SET(`tntuser:seraph:${uuid}`, '.', blacklistInfo as unknown as RedisJSON)
+    await redis.expire(`tntuser:seraph:${uuid}`, 1800)
+
+    return blacklistInfo
 }
 
 export async function updateLeaderboards() {
@@ -185,11 +216,11 @@ export async function updateLeaderboards() {
         return
     }
 
-    const winsTop150 = await db.mongo.userCol.find().sort({ wins: -1 }).limit(150).toArray();
-    const killsTop150 = await db.mongo.userCol.find().sort({ kills: -1 }).limit(150).toArray();
-    const deathsTop150 = await db.mongo.userCol.find().sort({ deaths: -1 }).limit(150).toArray();
-    const powerupsTop150 = await db.mongo.userCol.find().sort({ powerups: -1 }).limit(150).toArray();
-    const tagsTop150 = await db.mongo.userCol.find().sort({ tags: -1 }).limit(150).toArray();
+    const winsTop150 = await mongo.userCol.find().sort({ wins: -1 }).limit(150).toArray();
+    const killsTop150 = await mongo.userCol.find().sort({ kills: -1 }).limit(150).toArray();
+    const deathsTop150 = await mongo.userCol.find().sort({ deaths: -1 }).limit(150).toArray();
+    const powerupsTop150 = await mongo.userCol.find().sort({ powerups: -1 }).limit(150).toArray();
+    const tagsTop150 = await mongo.userCol.find().sort({ tags: -1 }).limit(150).toArray();
     let playerSet = new Set<string>();
 
     for (const player of leaderboardReq.data.leaderboards.TNTGAMES[3].leaders) {

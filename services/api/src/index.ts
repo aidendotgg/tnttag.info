@@ -2,10 +2,7 @@ import { Elysia } from "elysia";
 import { cors } from '@elysiajs/cors'
 import { helmet } from 'elysia-helmet';
 import { UserRouter } from "./routes/UserRouter";
-import { initDatabases } from "./utils/DatabaseUtils";
 import { updateLeaderboards } from "./utils/StatsUtils";
-
-export const db = await initDatabases(process.env.REDIS_URI!, process.env.MONGO_URI!, process.env.MONGO_DB!);
 
 const app = new Elysia()
   .use(UserRouter)

@@ -12,7 +12,7 @@
   "dependencies": {
     "@tnttag/fetch": "workspace:*",
     "@tnttag/formatting": "workspace:*",
-    "@tnttag/interfaces": "workspace:*",
+    "@tnttag/types": "workspace:*",
     "next": "16.1.1",
     "postcss": "^8.5.6",
     "react": "19.2.3",

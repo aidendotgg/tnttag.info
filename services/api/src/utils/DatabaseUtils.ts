@@ -1,38 +1,31 @@
 import { createClient, type RedisClientType } from "redis";
-import { Collection, Db, MongoClient } from 'mongodb'
-import { User } from "@tnttag/interfaces"
+import { Db, MongoClient } from 'mongodb'
+import type { Database } from '@tnttag/types';
 
-async function connectRedis(url: string) {
-    const redis: RedisClientType = createClient({ url });
+async function connectRedis(): Promise<RedisClientType> {
+    const redis: RedisClientType = createClient({ url: process.env.REDIS_URI });
 
-    redis.connect()
+    await redis.connect()
         .then(() => console.log('Connected to Redis'))
         .catch((err) => console.error('Redis connection error:', err));
 
     return redis;
 }
 
-async function connectMongoDB(uri: string, dbName: string) {
-    const mongoClient = new MongoClient(uri);
-    const mongoDB: Db = mongoClient.db(dbName);
+async function connectMongoDB(): Promise<Database> {
+    const mongoClient = new MongoClient(process.env.MONGO_URI!);
+    const db: Db = mongoClient.db(process.env.MONGO_DB!);
 
-    mongoClient.connect()
-        .then(() => console.log(`Connected to MongoDB: ${dbName}`))
+    await mongoClient.connect()
+        .then(() => console.log(`Connected to MongoDB: ${db.databaseName}`))
         .catch((err) => console.error('MongoDB connection error:', err));
 
-    return mongoDB;
+    return {
+        userCol: db.collection('users'),
+    }
 }
 
-export async function initDatabases(redisUri: string, mongoUri: string, mongoDbName: string): Promise<{
-    mongo: {
-        userCol: Collection<User>,
-    },
-    redis: RedisClientType
-}> {
-    const redis = await connectRedis(redisUri)
+export const mongo = await connectMongoDB();
+export const redis = await connectRedis();
 
-    let mongoDB = await connectMongoDB(mongoUri, mongoDbName)
-    let userCol = mongoDB.collection<User>("users")
-
-    return { mongo: { userCol }, redis };
-}
+export { MongoServerError } from 'mongodb';
