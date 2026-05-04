@@ -205,7 +205,7 @@ export default function Username() {
                   <div className='rounded-md bg-neutral-950/80 p-2 px-4 border-1 border-neutral-950'>
                     <h1 className="font-bold text-lg text-center text-minecraft-white">
                       <span className='text-minecraft-red'>Warning: </span>
-                      Player is blacklisted by{' '}
+                      Player is blacklisted on{' '}
                       <a className="text-minecraft-green hover:underline duration-300" href="https://seraph.si/" target="_blank">
                         Seraph
                       </a>
