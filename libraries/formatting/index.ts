@@ -18,7 +18,7 @@ export function getColor(color: string, defaultColor: string): string {
         ["DARK_BLUE", "#0000AA"],
     ]);
 
-    return colorMap.get(color.toUpperCase()) ?? defaultColor;
+    return colorMap.get(color?.toUpperCase()) ?? defaultColor;
 }
 
 export function getRank(player: any): string {
@@ -50,7 +50,7 @@ export function getRank(player: any): string {
     return rank
 }
 
-export function normalizeUUID(uuid: string) {
+export function normalizeUUID(uuid: string): string {
     if (!uuid.includes("-")) {
         return [uuid.slice(0, 8), uuid.slice(8, 12), uuid.slice(12, 16), uuid.slice(16, 20), uuid.slice(20)].join('-')
     }
@@ -63,14 +63,14 @@ export function formatWord(word: string): string {
         .replace(/\b\w/g, char => char.toUpperCase())
 }
 
-export function truncateString(str: string, maxLength: number) {
+export function truncateString(str: string, maxLength: number): string {
     if (str.length <= maxLength) {
         return str;
     }
     return str.slice(0, maxLength).trim() + '...';
 }
 
-export function formatCosmetic(cosmetic: string) {
+export function formatCosmetic(cosmetic: string): string {
     if (cosmetic.startsWith("death_effect_")) {
         return cosmetic.replace("death_effect_", "").split("_").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(" ")
     } else if (cosmetic.startsWith("particle_")) {
@@ -80,7 +80,7 @@ export function formatCosmetic(cosmetic: string) {
     }
 }
 
-export function formatSeraphTooltip(reason: string) {
+export function formatSeraphTooltip(reason: string): string {
     let editedReason = reason
 
     if (editedReason.includes(": ")) {
