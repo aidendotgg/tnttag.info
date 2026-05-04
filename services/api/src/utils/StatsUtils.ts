@@ -1,5 +1,5 @@
 import type { BlacklistTag, User } from "../../../../libraries/types"
-import { deathEffects, formatSeraphTooltip, getColor, getRank, hats, particles, suits } from "@tnttag/formatting"
+import { deathEffects, formatSeraphTooltip, formatUrchinType, getColor, getRank, hats, particles, suits } from "@tnttag/formatting"
 import type { RedisJSON } from "redis"
 import { mongo, redis } from "./DatabaseUtils"
 import { tntFetch } from "@tnttag/fetch";
@@ -204,6 +204,36 @@ export async function getSeraph(uuid: string): Promise<BlacklistTag | null> {
 
     await redis.json.SET(`tntuser:seraph:${uuid}`, '.', blacklistInfo as unknown as RedisJSON)
     await redis.expire(`tntuser:seraph:${uuid}`, 1800)
+
+    return blacklistInfo
+}
+
+export async function getUrchin(uuid: string): Promise<BlacklistTag | null> {
+    let cache = await redis.json.GET(`tntuser:urchin:${uuid}`) as BlacklistTag
+
+    if (cache) return cache
+
+    let urchinReq = await tntFetch(`https://urchin.ws/player/${uuid}?key=${process.env.URCHIN_API_KEY!}`, {
+        headers: {
+            "User-Agent": "TNTTag.info (+https://tnttag.info)"
+        }
+    })
+
+    if (!urchinReq.res?.ok || !urchinReq.data) {
+        console.log(`Failed to fetch urchin player data: ${urchinReq}`);
+        return null
+    }
+
+    if (urchinReq.data.tags.length === 0) return null
+
+    let blacklistInfo: BlacklistTag = {
+        message: urchinReq.data.tags[0]!.reason,
+        reason: formatUrchinType(urchinReq.data.tags[0]!.type),
+        verified: true
+    }
+
+    await redis.json.SET(`tntuser:urchin:${uuid}`, '.', blacklistInfo as unknown as RedisJSON)
+    await redis.expire(`tntuser:urchin:${uuid}`, 1800)
 
     return blacklistInfo
 }

@@ -1,3 +1,5 @@
+import type { BlacklistTag } from "@tnttag/types";
+
 export function getColor(color: string, defaultColor: string): string {
     const colorMap = new Map<string, string>([
         ["RED", "#FF5555"],
@@ -80,8 +82,8 @@ export function formatCosmetic(cosmetic: string): string {
     }
 }
 
-export function formatSeraphTooltip(reason: string): string {
-    let editedReason = reason
+export function formatSeraphTooltip(message: string): string {
+    let editedReason = message
 
     if (editedReason.includes(": ")) {
         editedReason = editedReason.split(": ")[1]!
@@ -92,6 +94,19 @@ export function formatSeraphTooltip(reason: string): string {
     }
 
     return editedReason
+}
+
+export function formatUrchinType(reason: "blatant_cheater" | "confirmed_cheater" | "closet_cheater" | "sniper"): BlacklistTag['reason'] {
+    switch (reason) {
+        case "blatant_cheater":
+            return "Blatant Cheating"
+        case "confirmed_cheater":
+            return "Blatant Cheating"
+        case "closet_cheater":
+            return "Closet Cheating"
+        case "sniper":
+            return "Sniping"
+    }
 }
 
 export const particles = [

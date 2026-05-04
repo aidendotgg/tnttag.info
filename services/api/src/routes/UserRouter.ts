@@ -2,7 +2,7 @@ import { Elysia, t, status } from "elysia";
 import { normalizeUUID } from "@tnttag/formatting";
 import type { User, Status, NameChange } from "@tnttag/types";
 import { tntFetch } from "@tnttag/fetch";
-import { getSeraph, getStats } from "../utils/StatsUtils";
+import { getSeraph, getStats, getUrchin } from "../utils/StatsUtils";
 import type { RedisJSON } from "redis";
 import { mongo, redis } from "../utils/DatabaseUtils";
 import { UUIDPlugin } from "../plugins/UUIDPlugin";
@@ -136,6 +136,27 @@ export const UserRouter = new Elysia({ prefix: "/user" })
 		normalizeUUID: true
 	})
 
+	.post('/urchin', async ({ uuid }) => {
+		let blacklistInfo = await getUrchin(uuid)
+
+		if (!blacklistInfo) {
+			return status(404, {
+				success: false,
+				error: "Player not found or not blacklisted"
+			})
+		}
+
+		return {
+			success: true,
+			tag: blacklistInfo,
+		}
+	}, {
+		body: t.Object({
+			_id: t.String()
+		}),
+		normalizeUUID: true
+	})
+
 	.get('/leaderboard', async () => {
 		let cache = await redis.json.GET('tntuser:leaderboards') as {
 			winsLeaderboard: User[],
@@ -227,6 +248,7 @@ export const UserRouter = new Elysia({ prefix: "/user" })
 		const requests = uuidList.map(async (uuid) => {
 			let player = await getStats(uuid)
 			let blacklistInfo = await getSeraph(uuid)
+			let ublacklistInfo = await getUrchin(uuid)
 
 			if (player) {
 				return {
@@ -235,7 +257,8 @@ export const UserRouter = new Elysia({ prefix: "/user" })
 					rank: player.rank,
 					plusColor: player.plusColor,
 					rankColor: player.rankColor,
-					tag: blacklistInfo
+					tag: blacklistInfo,
+					utag: ublacklistInfo
 				}
 			} else {
 				return { 
@@ -244,7 +267,8 @@ export const UserRouter = new Elysia({ prefix: "/user" })
 					rank: null,
 					plusColor: null, 
 					rankColor: null, 
-					tag: blacklistInfo 
+					tag: blacklistInfo,
+					utag: ublacklistInfo
 				}
 			}
 		})

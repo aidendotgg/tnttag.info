@@ -19,6 +19,7 @@ export default function Username() {
   const [status, setStatus] = useState<Status>();
   const [names, setNames] = useState<NameChange[]>();
   const [seraph, setSeraph] = useState<BlacklistTag>();
+  const [urchin, setUrchin] = useState<BlacklistTag>();
   const [cosmeticValues, setCosmeticValues] = useState<{ name: string; unlocked: boolean }[]>([]);
   const [cosmeticName, setCosmeticName] = useState<'Hats' | 'Suits' | 'Particles' | 'Death Effects'>('Hats');
   const [showDropdown, setShowDropdown] = useState(false);
@@ -101,6 +102,24 @@ export default function Username() {
 
     if (user) fetchSeraph();
   }, [user]);
+
+  useEffect(() => {
+    async function fetchUrchin() {
+      const urchinReq = await tntFetch(`${process.env.BACKEND_URL}/user/urchin`, {
+        method: 'POST',
+        body: JSON.stringify({ _id: user?._id }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (urchinReq.res?.ok && urchinReq.data) {
+        setUrchin(urchinReq.data.tag);
+      }
+    }
+
+    if (user) fetchUrchin();
+  }, [user])
 
   useEffect(() => {
     async function fetchSkin() {
@@ -212,6 +231,19 @@ export default function Username() {
                       {' '}for {seraph.reason.toLocaleLowerCase()}.
                     </h1>
                     <p className='font-bold text-lg text-center text-minecraft-white'>Reason: <span className='font-normal'>&quot;{seraph.message}&quot;</span></p>
+                  </div>
+                )}
+                {urchin && !seraph && (
+                  <div className='rounded-md bg-neutral-950/80 p-2 px-4 border-1 border-neutral-950'>
+                    <h1 className="font-bold text-lg text-center text-minecraft-white">
+                      <span className='text-minecraft-red'>Warning: </span>
+                      Player is blacklisted on{' '}
+                      <a className="text-minecraft-light_purple hover:underline duration-300" href="https://urchin.ws/" target="_blank">
+                        Urchin
+                      </a>
+                      {' '}for {urchin.reason.toLocaleLowerCase()}.
+                    </h1>
+                    <p className='font-bold text-lg text-center text-minecraft-white'>Reason: <span className='font-normal'>&quot;{urchin.message}&quot;</span></p>
                   </div>
                 )}
                 <div className="flex min-[1270px]:flex-row flex-col gap-2">
