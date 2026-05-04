@@ -229,9 +229,21 @@ export const UserRouter = new Elysia({ prefix: "/user" })
 			let blacklistInfo = await getSeraph(uuid)
 
 			if (player) {
-				return { uuid: uuid, wins: player.wins, tag: blacklistInfo }
+				return {
+					uuid: uuid,
+					wins: player.wins,
+					plusColor: player.plusColor,
+					rankColor: player.rankColor,
+					tag: blacklistInfo
+				}
 			} else {
-				return { uuid: uuid, wins: 0, tag: blacklistInfo }
+				return { 
+					uuid: uuid, 
+					wins: 0, 
+					plusColor: null, 
+					rankColor: null, 
+					tag: blacklistInfo 
+				}
 			}
 		})
 
