@@ -195,6 +195,7 @@ export async function getSeraph(uuid: string): Promise<BlacklistTag | null> {
     }
 
     if (!seraphReq.data.data.blacklist.tagged) return null
+    if (seraphReq.data.data.blacklist.report_type === "Caution" && seraphReq.data.data.blacklist.tooltip.includes("Caution: listed")) return null
 
     let blacklistInfo: BlacklistTag = {
         message: formatSeraphTooltip(seraphReq.data.data.blacklist.tooltip),
