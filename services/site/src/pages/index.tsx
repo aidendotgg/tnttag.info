@@ -23,9 +23,9 @@ export default function Home() {
   return (
     <>
       <section className="relative">
-        <div className="flex flex-col min-h-screen justify-center gap-4 px-4 pt-20 pb-10">
+        <div className="flex flex-col min-h-screen justify-center gap-4 px-4 pt-18 pb-10">
           <div className="flex flex-col max-w-xl w-full mx-auto text-center gap-2">
-            <h1 className="font-bold text-5xl text-minecraft-white">
+            <h1 className="font-bold min-[370px]:text-5xl text-4xl text-minecraft-white">
               <span className="text-minecraft-red">TNT</span>
               Tag.info
             </h1>

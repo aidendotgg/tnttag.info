@@ -98,7 +98,7 @@ export default function Leaderboard() {
   return (
     <>
       <section className="relative">
-        <div className="flex flex-col justify-center min-h-screen px-4 pt-20 pb-10">
+        <div className="flex flex-col justify-center min-h-screen px-4 pt-18 pb-10">
           <div className="flex flex-col items-center justify-center gap-2 w-full">
             {loading ? (
               <p className="text-center animate-bounce text-5xl text-minecraft-white">Loading...</p>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import { IdleAnimation, SkinViewer } from 'skinview3d';
 import { User, Status, NameChange, BlacklistTag } from '@tnttag/types';
@@ -23,6 +23,8 @@ export default function Username() {
   const [cosmeticValues, setCosmeticValues] = useState<{ name: string; unlocked: boolean }[]>([]);
   const [cosmeticName, setCosmeticName] = useState<'Hats' | 'Suits' | 'Particles' | 'Death Effects'>('Hats');
   const [showDropdown, setShowDropdown] = useState(false);
+
+  const progressBarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function fetchPlayer() {
@@ -187,8 +189,9 @@ export default function Username() {
                 <Wins wins={data.fromValue} />
               </p>
             )}
-            <div className={`flex min-[420px]:w-50 max-w-50 w-full rounded-md bg-neutral-700 h-3`}>
+            <div className={`flex sm:min-w-50 w-full rounded-md bg-neutral-700 h-3`}>
               <div
+                ref={progressBarRef}
                 style={{
                   width: `${progress}%`,
                   background: wins >= 10000 ? 'linear-gradient(to right, #ff5555, #ffaa00, #ffff55, #55ff55, #55ffff, #ff55ff, #aa00aa)' : undefined,
@@ -214,7 +217,7 @@ export default function Username() {
   return (
     <>
       <section className="relative">
-        <div className="flex flex-col justify-center min-h-screen px-4 pt-20 pb-10">
+        <div className="flex flex-col justify-center min-h-screen px-4 pt-18 pb-10">
           {loading ? (
             <p className="text-center animate-bounce text-5xl text-minecraft-white">Loading...</p>
           ) : (
