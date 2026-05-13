@@ -11,17 +11,7 @@ export function MojangPlugin() {
                     const { _id, username } = body as { _id?: string, username?: string }
 
                     if (_id) {
-                        let usernameReq = await tntFetch(`https://mowojang.seraph.si/${_id}`, { headers: { "User-Agent": "TNTTag.info (+https://tnttag.info)" } })
-
-                        if (!usernameReq.res?.ok || !usernameReq.json) {
-                            return status(404, {
-                                success: false,
-                                error: "Player not found",
-                                code: 1
-                            })
-                        }
-
-                        return { uuid: normalizeUUID(usernameReq.json.id), username: usernameReq.json.name }
+                        return { uuid: normalizeUUID(_id) }
                     } else if (username) {
                         let uuidReq = await tntFetch(`https://mowojang.seraph.si/${username}`, { headers: { "User-Agent": "TNTTag.info (+https://tnttag.info)" } })
 
@@ -36,10 +26,10 @@ export function MojangPlugin() {
                                 })
                             }
 
-                            return { uuid: normalizeUUID(possibleOldName._id), username: possibleOldName.username }
+                            return { uuid: normalizeUUID(possibleOldName._id) }
                         }
 
-                        return { uuid: normalizeUUID(uuidReq.json.id), username: uuidReq.json.name }
+                        return { uuid: normalizeUUID(uuidReq.json.id) }
                     } else {
                         return status(400, {
                             success: false,

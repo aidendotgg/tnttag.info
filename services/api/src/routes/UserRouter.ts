@@ -92,7 +92,7 @@ export const UserRouter = new Elysia({ prefix: "/user" })
 		resolveMojang: true
 	})
 
-	.post('/cape', async ({ uuid, username, set }) => {
+	.post('/cape', async ({ uuid }) => {
 		const mojangReq = await tntFetch(`https://mowojang.seraph.si/session/minecraft/profile/${uuid}`)
 
 		if (mojangReq.res?.ok && mojangReq.json) {
@@ -104,15 +104,6 @@ export const UserRouter = new Elysia({ prefix: "/user" })
 					success: true,
 					cape: textureProperty.textures.CAPE.url
 				}
-			}
-		}
-
-		const optifineReq = await tntFetch(`http://s.optifine.net/capes/${username}.png`)
-
-		if (optifineReq.res?.ok && optifineReq.data) {
-			return {
-				success: true,
-				cape: `https://api.tnttag.info/optifine/${username}`
 			}
 		}
 
