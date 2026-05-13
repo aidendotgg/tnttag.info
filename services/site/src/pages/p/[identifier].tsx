@@ -129,7 +129,7 @@ export default function Username() {
         canvas: document.getElementById('skin_container') as HTMLCanvasElement,
         width: 250,
         height: 305,
-        skin: `https://minotar.net/skin/${user?._id}`,
+        skin: `https://nmsr.nickac.dev/skin/${user?._id}`,
         animation: new IdleAnimation(),
       });
 

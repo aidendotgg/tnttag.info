@@ -214,7 +214,7 @@ export const UserRouter = new Elysia({ prefix: "/user" })
 		const { name } = query
 
 		let players = await mongo.userCol.find({
-			normalizedUsername: { $regex: `^${name.toLocaleLowerCase()}` }
+			normalizedUsername: { $regex: `^${name.toLowerCase()}` }
 		}, { projection: { _id: 1, username: 1 } }).sort({ wins: -1 }).toArray()
 
 		players.sort((a, b) => a.username.toUpperCase() == name.toUpperCase() ? -1 : b.username.toUpperCase() == name.toUpperCase() ? 1 : 0)
@@ -258,9 +258,11 @@ export const UserRouter = new Elysia({ prefix: "/user" })
 		}
 
 		const requests = uuidList.map(async (uuid) => {
-			let player = await getStats(uuid)
-			let blacklistInfo = await getSeraph(uuid)
-			let ublacklistInfo = await getUrchin(uuid)
+			const [player, blacklistInfo, ublacklistInfo] = await Promise.all([
+				getStats(uuid),
+				getSeraph(uuid),
+				getUrchin(uuid)
+			])
 
 			if (player) {
 				return {

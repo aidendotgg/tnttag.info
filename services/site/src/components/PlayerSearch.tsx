@@ -99,7 +99,7 @@ export default function PlayerSearch() {
                     onClick={() => router.push(`/p/${player._id}`)}
                     className={`${i === highlightIndex ? 'bg-neutral-800' : ''} flex flex-row gap-2 items-center hover:bg-neutral-800 w-full px-2 py-1.5`}
                   >
-                    <img alt="" className="w-8 h-8 rounded-sm" loading="lazy" src={`https://minotar.net/avatar/${player._id}`} />
+                    <img alt="" className="w-8 h-8 rounded-sm" loading="lazy" src={`https://nmsr.nickac.dev/face/${player._id}`} />
                     <p className="text-minecraft-white text-xl">{player.username}</p>
                   </button>
                 </li>

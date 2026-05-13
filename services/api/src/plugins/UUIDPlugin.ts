@@ -1,6 +1,7 @@
 import { tntFetch } from "@tnttag/fetch"
 import { normalizeUUID } from "@tnttag/formatting"
 import { Elysia, status } from "elysia"
+import { mongo } from "../utils/DatabaseUtils"
 
 export function UUIDPlugin() {
     return new Elysia({ name: "UUIDPlugin" })
@@ -12,17 +13,23 @@ export function UUIDPlugin() {
                     if (_id) {
                         return { uuid: normalizeUUID(_id) }
                     } else if (username) {
-                        let uuidReq = await tntFetch(`https://playerdb.co/api/player/minecraft/${username}`, { headers: { "User-Agent": "TNTTag.info (+https://tnttag.info)" } })
+                        let uuidReq = await tntFetch(`https://mowojang.seraph.si/${username}`, { headers: { "User-Agent": "TNTTag.info (+https://tnttag.info)" } })
 
                         if (!uuidReq.res?.ok || !uuidReq.data) {
-                            return status(404, {
-                                success: false,
-                                error: "Player not found",
-                                code: 1
-                            })
+                            let findPossibleOldName = await mongo.userCol.findOne({ normalizedUsername: username.toLowerCase() })
+
+                            if (!findPossibleOldName) {
+                                return status(404, {
+                                    success: false,
+                                    error: "Player not found",
+                                    code: 1
+                                })
+                            }
+
+                            return { uuid: normalizeUUID(findPossibleOldName._id) }
                         }
 
-                        return { uuid: normalizeUUID(uuidReq.data.data.player.id) }
+                        return { uuid: normalizeUUID(uuidReq.data.id) }
                     } else {
                         return status(400, {
                             success: false,
