@@ -93,10 +93,7 @@ export const UserRouter = new Elysia({ prefix: "/user" })
 	})
 
 	.post('/cape', async ({ uuid, username, set }) => {
-		const [mojangReq, optifineReq] = await Promise.all([
-			tntFetch(`https://mowojang.seraph.si/session/minecraft/profile/${uuid}`),
-			tntFetch(`http://s.optifine.net/capes/${username}.png`)
-		])
+		const mojangReq = await tntFetch(`https://mowojang.seraph.si/session/minecraft/profile/${uuid}`)
 
 		if (mojangReq.res?.ok && mojangReq.json) {
 			let mojangProperties = mojangReq.json.properties as { name: string, value: string }[]
@@ -109,6 +106,8 @@ export const UserRouter = new Elysia({ prefix: "/user" })
 				}
 			}
 		}
+
+		const optifineReq = await tntFetch(`http://s.optifine.net/capes/${username}.png`)
 
 		if (optifineReq.res?.ok && optifineReq.data) {
 			return {
