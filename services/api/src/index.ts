@@ -2,10 +2,12 @@ import { Elysia } from "elysia";
 import { cors } from '@elysiajs/cors'
 import { helmet } from 'elysia-helmet';
 import { UserRouter } from "./routes/UserRouter";
+import { OptifineRouter } from "./routes/OptifineRouter";
 import { updateLeaderboards } from "./utils/StatsUtils";
 
 const app = new Elysia()
   .use(UserRouter)
+  .use(OptifineRouter)
   .get('/', () => {
     return {
       success: true,

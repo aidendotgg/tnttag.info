@@ -113,7 +113,7 @@ export const UserRouter = new Elysia({ prefix: "/user" })
 		if (optifineReq.res?.ok && optifineReq.data) {
 			return {
 				success: true,
-				cape: `http://s.optifine.net/capes/${username}.png`
+				cape: `https://api.tnttag.info/optifine/${username}`
 			}
 		}
 
