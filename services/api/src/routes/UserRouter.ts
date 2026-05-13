@@ -5,7 +5,7 @@ import { tntFetch } from "@tnttag/fetch";
 import { getSeraph, getStats, getUrchin } from "../utils/StatsUtils";
 import type { RedisJSON } from "redis";
 import { mongo, redis } from "../utils/DatabaseUtils";
-import { UUIDPlugin } from "../plugins/UUIDPlugin";
+import { MojangPlugin } from "../plugins/MojangPlugin";
 import { rateLimit, type Generator } from "elysia-rate-limit";
 import { ip } from "elysia-ip";
 
@@ -14,7 +14,7 @@ const keyGenerator: Generator<{ ip: string }> = async (req, server, { ip }) => {
 };
 
 export const UserRouter = new Elysia({ prefix: "/user" })
-	.use(UUIDPlugin())
+	.use(MojangPlugin())
 	.use(ip())
 	.use(rateLimit({
 		duration: 15000,
@@ -41,7 +41,7 @@ export const UserRouter = new Elysia({ prefix: "/user" })
 			username: t.Optional(t.String({ format: 'regex', pattern: '^[a-zA-Z0-9_]*$', maxLength: 16, minLength: 2 })),
 			_id: t.Optional(t.String())
 		}),
-		normalizeUUID: true
+		resolveMojang: true
 	})
 
 	.post('/status', async ({ uuid }) => {
@@ -89,7 +89,7 @@ export const UserRouter = new Elysia({ prefix: "/user" })
 		body: t.Object({
 			_id: t.String()
 		}),
-		normalizeUUID: true
+		resolveMojang: true
 	})
 
 	.post('/cape', async ({ uuid, username, set }) => {
@@ -125,7 +125,7 @@ export const UserRouter = new Elysia({ prefix: "/user" })
 		body: t.Object({
 			_id: t.String()
 		}),
-		normalizeUUID: true
+		resolveMojang: true
 	})
 
 	.post('/names', async ({ uuid }) => {
@@ -160,7 +160,7 @@ export const UserRouter = new Elysia({ prefix: "/user" })
 		body: t.Object({
 			_id: t.String()
 		}),
-		normalizeUUID: true
+		resolveMojang: true
 	})
 
 	.post('/seraph', async ({ uuid }) => {
@@ -181,7 +181,7 @@ export const UserRouter = new Elysia({ prefix: "/user" })
 		body: t.Object({
 			_id: t.String()
 		}),
-		normalizeUUID: true
+		resolveMojang: true
 	})
 
 	.post('/urchin', async ({ uuid }) => {
@@ -202,7 +202,7 @@ export const UserRouter = new Elysia({ prefix: "/user" })
 		body: t.Object({
 			_id: t.String()
 		}),
-		normalizeUUID: true
+		resolveMojang: true
 	})
 
 	.get('/leaderboard', async () => {

@@ -3,15 +3,25 @@ import { normalizeUUID } from "@tnttag/formatting"
 import { Elysia, status } from "elysia"
 import { mongo } from "../utils/DatabaseUtils"
 
-export function UUIDPlugin() {
-    return new Elysia({ name: "UUIDPlugin" })
+export function MojangPlugin() {
+    return new Elysia({ name: "MojangPlugin" })
         .macro({
-            normalizeUUID: {
+            resolveMojang: {
                 resolve: async ({ body }) => {
                     const { _id, username } = body as { _id?: string, username?: string }
 
                     if (_id) {
-                        return { uuid: normalizeUUID(_id) }
+                        let usernameReq = await tntFetch(`https://mowojang.seraph.si/${_id}`, { headers: { "User-Agent": "TNTTag.info (+https://tnttag.info)" } })
+
+                        if (!usernameReq.res?.ok || !usernameReq.json) {
+                            return status(404, {
+                                success: false,
+                                error: "Player not found",
+                                code: 1
+                            })
+                        }
+
+                        return { uuid: normalizeUUID(usernameReq.json.id), username: usernameReq.json.name }
                     } else if (username) {
                         let uuidReq = await tntFetch(`https://mowojang.seraph.si/${username}`, { headers: { "User-Agent": "TNTTag.info (+https://tnttag.info)" } })
 
