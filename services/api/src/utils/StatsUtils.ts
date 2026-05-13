@@ -256,7 +256,7 @@ export async function updateLeaderboards() {
     const tagsTop150 = await mongo.userCol.find().sort({ tags: -1 }).limit(150).toArray();
     let playerSet = new Set<string>();
 
-    for (const player of leaderboardReq.json.data.leaderboards.TNTGAMES[3].leaders) {
+    for (const player of leaderboardReq.json.leaderboards.TNTGAMES[3].leaders) {
         playerSet.add(player);
     }
     for (const player of winsTop150) {
