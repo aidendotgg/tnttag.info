@@ -22,12 +22,12 @@ export default function PlayerSearch() {
     const autoCompleteTimeout = setTimeout(async () => {
       const autocompleteReq = await tntFetch(`${process.env.BACKEND_URL}/user/autocomplete?name=${identifier}`);
 
-      if (!autocompleteReq.res?.ok || !autocompleteReq.data) {
+      if (!autocompleteReq.res?.ok || !autocompleteReq.json) {
         setAutoCompleteLoading(false);
         return;
       }
 
-      setAutoComplete(autocompleteReq.data.players);
+      setAutoComplete(autocompleteReq.json.players);
       setAutoCompleteLoading(false);
     }, 300);
 

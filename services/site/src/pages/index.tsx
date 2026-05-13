@@ -12,9 +12,9 @@ export default function Home() {
     async function fetchData() {
       const countReq = await tntFetch(`${process.env.BACKEND_URL}/user/count`);
 
-      if (!countReq.res?.ok || !countReq.data) return;
+      if (!countReq.res?.ok || !countReq.json) return;
 
-      setCountData(countReq.data);
+      setCountData(countReq.json);
     }
 
     fetchData();

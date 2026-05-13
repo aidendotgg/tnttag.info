@@ -39,25 +39,25 @@ export default function Username() {
         },
       });
 
-      if (!userReq.res?.ok || !userReq.data) {
+      if (!userReq.res?.ok || !userReq.json) {
         router.push('/');
         return;
       }
 
-      setUser(userReq.data);
-      setCosmeticValues(userReq.data.unlockedHats);
+      setUser(userReq.json);
+      setCosmeticValues(userReq.json.unlockedHats);
 
-      if (userReq.data.lastLogin) {
+      if (userReq.json.lastLogin) {
         const statusReq = await tntFetch(`${process.env.BACKEND_URL}/user/status`, {
           method: 'POST',
-          body: JSON.stringify({ _id: userReq.data._id }),
+          body: JSON.stringify({ _id: userReq.json._id }),
           headers: {
             'Content-Type': 'application/json',
           },
         });
 
-        if (statusReq.res?.ok && statusReq.data) {
-          setStatus(statusReq.data);
+        if (statusReq.res?.ok && statusReq.json) {
+          setStatus(statusReq.json);
         }
       }
 
@@ -77,8 +77,8 @@ export default function Username() {
         },
       });
 
-      if (nameReq.res?.ok && nameReq.data) {
-        setNames(nameReq.data.names.reverse());
+      if (nameReq.res?.ok && nameReq.json) {
+        setNames(nameReq.json.names.reverse());
       }
 
       setNamesLoading(false);
@@ -97,8 +97,8 @@ export default function Username() {
         },
       });
 
-      if (seraphReq.res?.ok && seraphReq.data) {
-        setSeraph(seraphReq.data.tag);
+      if (seraphReq.res?.ok && seraphReq.json) {
+        setSeraph(seraphReq.json.tag);
       }
     }
 
@@ -115,8 +115,8 @@ export default function Username() {
         },
       })
 
-      if (urchinReq.res?.ok && urchinReq.data) {
-        setUrchin(urchinReq.data.tag);
+      if (urchinReq.res?.ok && urchinReq.json) {
+        setUrchin(urchinReq.json.tag);
       }
     }
 
@@ -136,16 +136,16 @@ export default function Username() {
       skinViewer.autoRotate = true;
       skinViewer.autoRotateSpeed = 0.5;
 
-      const capesReq = await tntFetch(`https://api.capes.dev/load/${user?.username}`);
+      const capeReq = await tntFetch(`${process.env.BACKEND_URL}/user/cape`, {
+        method: 'POST',
+        body: JSON.stringify({ _id: user?._id }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-      if (!capesReq.res?.ok || !capesReq.data) {
-        return;
-      }
-
-      if (capesReq.data.minecraft.imageUrl) {
-        skinViewer.loadCape(capesReq.data.minecraft.imageUrl);
-      } else if (capesReq.data.optifine.imageUrl) {
-        skinViewer.loadCape(capesReq.data.optifine.imageUrl);
+      if (capeReq.res?.ok && capeReq.json) {
+        skinViewer.loadCape(capeReq.json.cape)
       }
     }
 

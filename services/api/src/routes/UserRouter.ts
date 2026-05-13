@@ -10,7 +10,7 @@ import { rateLimit, type Generator } from "elysia-rate-limit";
 import { ip } from "elysia-ip";
 
 const keyGenerator: Generator<{ ip: string }> = async (req, server, { ip }) => {
-    return Bun.hash(JSON.stringify(ip)).toString();
+	return Bun.hash(JSON.stringify(ip)).toString();
 };
 
 export const UserRouter = new Elysia({ prefix: "/user" })
@@ -56,14 +56,14 @@ export const UserRouter = new Elysia({ prefix: "/user" })
 
 		let statusReq = await tntFetch(`https://api.hypixel.net/v2/status?key=${process.env.HYPIXEL_API_KEY}&uuid=${uuid}`)
 
-		if (!statusReq.res?.ok || !statusReq.data) {
+		if (!statusReq.res?.ok || !statusReq.json) {
 			return status(500, {
 				success: false,
 				error: "Failed to fetch status data"
 			})
 		}
 
-		let statusData = statusReq.data.session
+		let statusData = statusReq.json.session
 		if (!statusData) return status(404, { success: false, error: "No status data found" })
 
 		let online = statusData.online ?? false
@@ -92,6 +92,42 @@ export const UserRouter = new Elysia({ prefix: "/user" })
 		normalizeUUID: true
 	})
 
+	.post('/cape', async ({ uuid, username, set }) => {
+		const [mojangReq, optifineReq] = await Promise.all([
+			tntFetch(`https://mowojang.seraph.si/session/minecraft/profile/${uuid}`),
+			tntFetch(`https://s.optifine.net/capes/${username}.png`)
+		])
+
+		if (mojangReq.res?.ok && mojangReq.json) {
+			let mojangProperties = mojangReq.json.properties as { name: string, value: string }[]
+			let textureProperty = JSON.parse(Buffer.from(mojangProperties.find(prop => prop.name === "textures")?.value ?? '{}', 'base64').toString('utf-8'))
+
+			if (textureProperty?.textures?.CAPE) {
+				return {
+					success: true,
+					cape: textureProperty.textures.CAPE.url
+				}
+			}
+		}
+
+		if (optifineReq.res?.ok && optifineReq.data) {
+			return {
+				success: true,
+				cape: `https://s.optifine.net/capes/${username}.png`
+			}
+		}
+
+		return status(404, {
+			success: false,
+			error: "No cape found for this user"
+		})
+	}, {
+		body: t.Object({
+			_id: t.String()
+		}),
+		normalizeUUID: true
+	})
+
 	.post('/names', async ({ uuid }) => {
 		let cache = await redis.json.GET(`tntuser:names:${uuid}`) as NameChange[]
 
@@ -104,14 +140,14 @@ export const UserRouter = new Elysia({ prefix: "/user" })
 
 		let nameReq = await tntFetch(`https://api.antisniper.net/v2/mojang?key=${process.env.ANTISNIPER_API_KEY}&uuid=${uuid}`)
 
-		if (!nameReq.res?.ok || !nameReq.data) {
+		if (!nameReq.res?.ok || !nameReq.json) {
 			return status(500, {
 				success: false,
 				error: "Failed to fetch name data"
 			})
 		}
 
-		let dedupedNames: NameChange[] = nameReq.data.name_changes.filter((item: NameChange, i: number, arr: NameChange[]) => i === 0 || item.name !== arr[i - 1]!.name)
+		let dedupedNames: NameChange[] = nameReq.json.name_changes.filter((item: NameChange, i: number, arr: NameChange[]) => i === 0 || item.name !== arr[i - 1]!.name)
 
 		await redis.json.SET(`tntuser:names:${uuid}`, '.', dedupedNames as unknown as RedisJSON)
 		await redis.expire(`tntuser:names:${uuid}`, 3600)
@@ -275,12 +311,12 @@ export const UserRouter = new Elysia({ prefix: "/user" })
 					utag: ublacklistInfo
 				}
 			} else {
-				return { 
-					uuid: uuid, 
+				return {
+					uuid: uuid,
 					wins: 0,
 					rank: null,
-					plusColor: null, 
-					rankColor: null, 
+					plusColor: null,
+					rankColor: null,
 					tag: blacklistInfo,
 					utag: ublacklistInfo
 				}

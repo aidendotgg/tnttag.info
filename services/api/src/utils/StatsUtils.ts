@@ -15,12 +15,12 @@ export async function getStats(uuid: string): Promise<User | null> {
 
     let playerReq = await tntFetch(`https://api.hypixel.net/v2/player?key=${process.env.HYPIXEL_API_KEY}&uuid=${uuid}`)
 
-    if (!playerReq.res?.ok || !playerReq.data) {
+    if (!playerReq.res?.ok || !playerReq.json) {
         console.log(`Failed to fetch hypixel player data: ${playerReq.res?.status} ${playerReq.res?.statusText}`);
         return null
     }
 
-    let playerData = playerReq.data.player
+    let playerData = playerReq.json.player
     if (!playerData) return null
 
     let displayName = playerData.displayname
@@ -189,20 +189,20 @@ export async function getSeraph(uuid: string): Promise<BlacklistTag | null> {
         }
     })
 
-    if (!seraphReq.res?.ok || !seraphReq.data) {
+    if (!seraphReq.res?.ok || !seraphReq.json) {
         console.log(`Failed to fetch seraph player data: ${JSON.stringify(seraphReq)}`);
         return null
     }
 
-    if (!seraphReq.data.data.blacklist.tagged) return null
-    if (seraphReq.data.data.blacklist.report_type === "Legit Sniper") return null
-    if (seraphReq.data.data.blacklist.report_type === "Annoying") return null
-    if ((seraphReq.data.data.blacklist.report_type === "Caution" || seraphReq.data.data.blacklist.report_type === "Alt") && (seraphReq.data.data.blacklist.tooltip.includes("listed") || seraphReq.data.data.blacklist.tooltip.includes("sold"))) return null
+    if (!seraphReq.json.data.blacklist.tagged) return null
+    if (seraphReq.json.data.blacklist.report_type === "Legit Sniper") return null
+    if (seraphReq.json.data.blacklist.report_type === "Annoying") return null
+    if ((seraphReq.json.data.blacklist.report_type === "Caution" || seraphReq.json.data.blacklist.report_type === "Alt") && (seraphReq.json.data.blacklist.tooltip.includes("listed") || seraphReq.json.data.blacklist.tooltip.includes("sold"))) return null
 
     let blacklistInfo: BlacklistTag = {
-        message: formatSeraphTooltip(seraphReq.data.data.blacklist.tooltip),
-        reason: seraphReq.data.data.blacklist.report_type ?? "Unknown",
-        verified: seraphReq.data.data.blacklist.verified ?? false
+        message: formatSeraphTooltip(seraphReq.json.data.blacklist.tooltip),
+        reason: seraphReq.json.data.blacklist.report_type ?? "Unknown",
+        verified: seraphReq.json.data.blacklist.verified ?? false
     }
 
     await redis.json.SET(`tntuser:seraph:${uuid}`, '.', blacklistInfo as unknown as RedisJSON)
@@ -222,16 +222,16 @@ export async function getUrchin(uuid: string): Promise<BlacklistTag | null> {
         }
     })
 
-    if (!urchinReq.res?.ok || !urchinReq.data) {
+    if (!urchinReq.res?.ok || !urchinReq.json) {
         console.log(`Failed to fetch urchin player data: ${JSON.stringify(urchinReq)}`);
         return null
     }
 
-    if (urchinReq.data.tags?.length === 0) return null
+    if (urchinReq.json.tags?.length === 0) return null
 
     let blacklistInfo: BlacklistTag = {
-        message: urchinReq.data.tags[0]!.reason,
-        reason: formatUrchinType(urchinReq.data.tags[0]!.type),
+        message: urchinReq.json.tags[0]!.reason,
+        reason: formatUrchinType(urchinReq.json.tags[0]!.type),
         verified: true
     }
 
@@ -244,7 +244,7 @@ export async function getUrchin(uuid: string): Promise<BlacklistTag | null> {
 export async function updateLeaderboards() {
     let leaderboardReq = await tntFetch(`https://api.hypixel.net/v2/leaderboards?key=${process.env.HYPIXEL_API_KEY}`)
 
-    if (!leaderboardReq.res?.ok || !leaderboardReq.data) {
+    if (!leaderboardReq.res?.ok || !leaderboardReq.json) {
         console.log(`Failed to fetch hypixel leaderboard data: ${JSON.stringify(leaderboardReq)}`);
         return
     }
@@ -256,7 +256,7 @@ export async function updateLeaderboards() {
     const tagsTop150 = await mongo.userCol.find().sort({ tags: -1 }).limit(150).toArray();
     let playerSet = new Set<string>();
 
-    for (const player of leaderboardReq.data.leaderboards.TNTGAMES[3].leaders) {
+    for (const player of leaderboardReq.json.data.leaderboards.TNTGAMES[3].leaders) {
         playerSet.add(player);
     }
     for (const player of winsTop150) {

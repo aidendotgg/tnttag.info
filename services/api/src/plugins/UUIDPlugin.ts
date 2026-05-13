@@ -15,10 +15,10 @@ export function UUIDPlugin() {
                     } else if (username) {
                         let uuidReq = await tntFetch(`https://mowojang.seraph.si/${username}`, { headers: { "User-Agent": "TNTTag.info (+https://tnttag.info)" } })
 
-                        if (!uuidReq.res?.ok || !uuidReq.data) {
-                            let findPossibleOldName = await mongo.userCol.findOne({ normalizedUsername: username.toLowerCase() })
+                        if (!uuidReq.res?.ok || !uuidReq.json) {
+                            let possibleOldName = await mongo.userCol.findOne({ normalizedUsername: username.toLowerCase() })
 
-                            if (!findPossibleOldName) {
+                            if (!possibleOldName) {
                                 return status(404, {
                                     success: false,
                                     error: "Player not found",
@@ -26,10 +26,10 @@ export function UUIDPlugin() {
                                 })
                             }
 
-                            return { uuid: normalizeUUID(findPossibleOldName._id) }
+                            return { uuid: normalizeUUID(possibleOldName._id), username: possibleOldName.username }
                         }
 
-                        return { uuid: normalizeUUID(uuidReq.data.id) }
+                        return { uuid: normalizeUUID(uuidReq.json.id), username: uuidReq.json.name }
                     } else {
                         return status(400, {
                             success: false,

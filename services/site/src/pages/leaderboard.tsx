@@ -48,17 +48,17 @@ export default function Leaderboard() {
     async function fetchLeaderboard() {
       const leaderboardReq = await tntFetch(`${process.env.BACKEND_URL}/user/leaderboard`);
 
-      if (!leaderboardReq.res?.ok || !leaderboardReq.data) {
+      if (!leaderboardReq.res?.ok || !leaderboardReq.json) {
         router.push('/');
         return;
       }
 
-      setWinsData(mapLeaderboard(leaderboardReq.data.winsLeaderboard, 'wins'));
-      setKillsData(mapLeaderboard(leaderboardReq.data.killsLeaderboard, 'kills'));
-      setDeathsData(mapLeaderboard(leaderboardReq.data.deathsLeaderboard, 'deaths'));
-      setPowerupsData(mapLeaderboard(leaderboardReq.data.powerupsLeaderboard, 'powerups'));
-      setTagsData(mapLeaderboard(leaderboardReq.data.tagsLeaderboard, 'tags'));
-      setLeaderboardValues(mapLeaderboard(leaderboardReq.data.winsLeaderboard, 'wins'));
+      setWinsData(mapLeaderboard(leaderboardReq.json.winsLeaderboard, 'wins'));
+      setKillsData(mapLeaderboard(leaderboardReq.json.killsLeaderboard, 'kills'));
+      setDeathsData(mapLeaderboard(leaderboardReq.json.deathsLeaderboard, 'deaths'));
+      setPowerupsData(mapLeaderboard(leaderboardReq.json.powerupsLeaderboard, 'powerups'));
+      setTagsData(mapLeaderboard(leaderboardReq.json.tagsLeaderboard, 'tags'));
+      setLeaderboardValues(mapLeaderboard(leaderboardReq.json.winsLeaderboard, 'wins'));
       setLoading(false);
     }
 
