@@ -3,9 +3,11 @@ import { cors } from '@elysiajs/cors'
 import { helmet } from 'elysia-helmet';
 import { UserRouter } from "./routes/UserRouter";
 import { updateLeaderboards } from "./utils/StatsUtils";
+import { OptifineRouter } from "./routes/OptifineRouter";
 
 const app = new Elysia()
   .use(UserRouter)
+  .use(OptifineRouter)
   .get('/', () => {
     return {
       success: true,

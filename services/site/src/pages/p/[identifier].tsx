@@ -81,21 +81,13 @@ export default function Username() {
           width: 250,
           height: 305,
           skin: textureProperty?.textures?.SKIN?.url,
+          cape: textureProperty?.textures?.CAPE?.url ?? `${process.env.BACKEND_URL}/optifine/${user?.username}`,
           animation: new IdleAnimation(),
         });
 
         skinViewer.autoRotate = true;
         skinViewer.autoRotateSpeed = 0.5;
-        skinViewer.loadCape(textureProperty?.textures?.CAPE?.url);
         setSkinLoading(false);
-
-        if (!textureProperty?.textures?.CAPE?.url) {
-          let optifineReq = await tntFetch(`https://api.capes.dev/load/${user?._id}/optifine`);
-
-          if (optifineReq.res?.ok && optifineReq.json?.imageUrl) {
-            skinViewer.loadCape(optifineReq.json.imageUrl);
-          }
-        }
       }
     }
 
