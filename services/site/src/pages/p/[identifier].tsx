@@ -81,12 +81,12 @@ export default function Username() {
           width: 250,
           height: 305,
           skin: textureProperty?.textures?.SKIN?.url,
-          cape: textureProperty?.textures?.CAPE?.url,
           animation: new IdleAnimation(),
         });
 
         skinViewer.autoRotate = true;
         skinViewer.autoRotateSpeed = 0.5;
+        skinViewer.loadCape(textureProperty?.textures?.CAPE?.url);
         setSkinLoading(false);
 
         if (!textureProperty?.textures?.CAPE?.url) {
