@@ -13,7 +13,7 @@ export function MojangPlugin() {
                     if (_id) {
                         return { uuid: normalizeUUID(_id) }
                     } else if (username) {
-                        let uuidReq = await tntFetch(`https://mowojang.seraph.si/users/profiles/minecraft/${username}`, { headers: { "User-Agent": "TNTTag.info (+https://tnttag.info)" } })
+                        let uuidReq = await tntFetch(`https://playerdb.co/api/player/minecraft/${username}`, { headers: { "User-Agent": "TNTTag.info (+https://tnttag.info)" } })
 
                         if (!uuidReq.res?.ok || !uuidReq.json) {
                             let possibleOldName = await mongo.userCol.findOne({ normalizedUsername: username.toLowerCase() })
@@ -29,7 +29,7 @@ export function MojangPlugin() {
                             return { uuid: normalizeUUID(possibleOldName._id) }
                         }
 
-                        return { uuid: normalizeUUID(uuidReq.json.id) }
+                        return { uuid: normalizeUUID(uuidReq.json.data.player.id) }
                     } else {
                         return status(400, {
                             success: false,
