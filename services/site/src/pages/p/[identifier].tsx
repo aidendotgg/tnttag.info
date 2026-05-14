@@ -15,6 +15,7 @@ export default function Username() {
 
   const [loading, setLoading] = useState(true);
   const [namesLoading, setNamesLoading] = useState(true);
+  const [skinLoading, setSkinLoading] = useState(true);
   const [user, setUser] = useState<User>();
   const [status, setStatus] = useState<Status>();
   const [names, setNames] = useState<NameChange[]>();
@@ -66,6 +67,40 @@ export default function Username() {
 
     if (identifier) fetchPlayer();
   }, [identifier]);
+
+  useEffect(() => {
+    async function fetchSkin() {
+      const mojangReq = await tntFetch(`https://mowojang.seraph.si/session/minecraft/profile/${user?._id}`)
+
+      if (mojangReq.res?.ok && mojangReq.json) {
+        let mojangProperties = mojangReq.json.properties as { name: string, value: string }[]
+        let textureProperty = JSON.parse(Buffer.from(mojangProperties.find(prop => prop.name === "textures")?.value ?? '{}', 'base64').toString('utf-8'))
+
+        const skinViewer = new SkinViewer({
+          canvas: document.getElementById('skin_container') as HTMLCanvasElement,
+          width: 250,
+          height: 305,
+          skin: textureProperty?.textures?.SKIN?.url,
+          cape: textureProperty?.textures?.CAPE?.url,
+          animation: new IdleAnimation(),
+        });
+
+        skinViewer.autoRotate = true;
+        skinViewer.autoRotateSpeed = 0.5;
+        setSkinLoading(false);
+
+        if (!textureProperty?.textures?.CAPE?.url) {
+          let optifineReq = await tntFetch(`https://api.capes.dev/load/${user?._id}/optifine`);
+
+          if (optifineReq.res?.ok && optifineReq.json?.imageUrl) {
+            skinViewer.loadCape(optifineReq.json.imageUrl);
+          }
+        }
+      }
+    }
+
+    if (user && !loading) fetchSkin();
+  }, [user, loading]);
 
   useEffect(() => {
     async function fetchNames() {
@@ -122,35 +157,6 @@ export default function Username() {
 
     if (user) fetchUrchin();
   }, [user])
-
-  useEffect(() => {
-    async function fetchSkin() {
-      const skinViewer = new SkinViewer({
-        canvas: document.getElementById('skin_container') as HTMLCanvasElement,
-        width: 250,
-        height: 305,
-        skin: `https://nmsr.nickac.dev/skin/${user?._id}`,
-        animation: new IdleAnimation(),
-      });
-
-      skinViewer.autoRotate = true;
-      skinViewer.autoRotateSpeed = 0.5;
-
-      const capeReq = await tntFetch(`${process.env.BACKEND_URL}/user/cape`, {
-        method: 'POST',
-        body: JSON.stringify({ _id: user?._id }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (capeReq.res?.ok && capeReq.json) {
-        skinViewer.loadCape(capeReq.json.cape)
-      }
-    }
-
-    if (user && !loading) fetchSkin();
-  }, [user, loading]);
 
   function formatWinMilestone(wins: number) {
     const winColorMap = new Map<
@@ -256,7 +262,10 @@ export default function Username() {
                         <h1 className="min-[440px]:text-3xl text-2xl text-center">
                           <Rank username={user!.username} rank={user!.rank} rankColor={user!.rankColor} plusColor={user!.plusColor} />
                         </h1>
-                        <canvas id="skin_container" className="hover:cursor-pointer active:cursor-move w-62.5" />
+                        <div className={`relative flex flex-col h-full w-62.5 justify-center items-center ${skinLoading ? '' : 'hidden'}`}>
+                          <p className="text-center animate-bounce text-2xl text-minecraft-white">Loading...</p>
+                        </div>
+                        <canvas id="skin_container" className={`hover:cursor-pointer active:cursor-move w-62.5 ${skinLoading ? 'hidden' : ''}`} />
                       </div>
                       <div className="flex w-full h-full flex-col rounded-md bg-neutral-950/80 p-4 border-1 border-neutral-950">
                         <div className="flex flex-col whitespace-nowrap">

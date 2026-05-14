@@ -92,32 +92,6 @@ export const UserRouter = new Elysia({ prefix: "/user" })
 		resolveMojang: true
 	})
 
-	.post('/cape', async ({ uuid }) => {
-		const mojangReq = await tntFetch(`https://mowojang.seraph.si/session/minecraft/profile/${uuid}`)
-
-		if (mojangReq.res?.ok && mojangReq.json) {
-			let mojangProperties = mojangReq.json.properties as { name: string, value: string }[]
-			let textureProperty = JSON.parse(Buffer.from(mojangProperties.find(prop => prop.name === "textures")?.value ?? '{}', 'base64').toString('utf-8'))
-
-			if (textureProperty?.textures?.CAPE) {
-				return {
-					success: true,
-					cape: textureProperty.textures.CAPE.url
-				}
-			}
-		}
-
-		return status(404, {
-			success: false,
-			error: "No cape found for this user"
-		})
-	}, {
-		body: t.Object({
-			_id: t.String()
-		}),
-		resolveMojang: true
-	})
-
 	.post('/names', async ({ uuid }) => {
 		let cache = await redis.json.GET(`tntuser:names:${uuid}`) as NameChange[]
 
