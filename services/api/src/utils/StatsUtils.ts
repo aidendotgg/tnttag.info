@@ -195,7 +195,7 @@ export async function getSeraph(uuid: string): Promise<BlacklistTag | null> {
     }
 
     if (!seraphReq.json.data.blacklist.tagged) return null
-    if (seraphReq.json.data.blacklist.report_type === "Legit Sniper") return null
+    if (seraphReq.json.data.blacklist.report_type === "Legit Sniping") return null
     if (seraphReq.json.data.blacklist.report_type === "Annoying") return null
     if ((seraphReq.json.data.blacklist.report_type === "Caution" || seraphReq.json.data.blacklist.report_type === "Alt") && (seraphReq.json.data.blacklist.tooltip.includes("listed") || seraphReq.json.data.blacklist.tooltip.includes("sold"))) return null
 
