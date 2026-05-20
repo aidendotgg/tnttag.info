@@ -182,7 +182,7 @@ export async function getSeraph(uuid: string): Promise<BlacklistTag | null> {
 
     if (cache) return cache
 
-    let seraphReq = await tntFetch(`http://api.seraph.si/${uuid}/blacklist`, {
+    let seraphReq = await tntFetch(`https://api.seraph.si/${uuid}/blacklist`, {
         headers: {
             "User-Agent": "TNTTag.info (+https://tnttag.info)",
             "seraph-api-key": process.env.SERAPH_API_KEY!
