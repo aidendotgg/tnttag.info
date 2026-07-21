@@ -231,7 +231,7 @@ export async function getUrchin(uuid: string): Promise<BlacklistTag | null> {
 
     let blacklistInfo: BlacklistTag = {
         message: urchinReq.json.tags[0]!.reason,
-        reason: formatUrchinType(urchinReq.json.tags[0]!.type),
+        reason: formatUrchinType(urchinReq.json.tags[0]!.tag_type),
         verified: true
     }
 
