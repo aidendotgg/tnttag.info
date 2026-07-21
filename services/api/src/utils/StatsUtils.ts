@@ -216,7 +216,7 @@ export async function getUrchin(uuid: string): Promise<BlacklistTag | null> {
 
     if (cache) return cache
 
-    let urchinReq = await tntFetch(`https://urchin.ws/player/${uuid}?key=${process.env.URCHIN_API_KEY!}`, {
+    let urchinReq = await tntFetch(`https://api.urchin.gg/v3/player/tags?player=${uuid}&key=${process.env.URCHIN_API_KEY!}`, {
         headers: {
             "User-Agent": "TNTTag.info (+https://tnttag.info)"
         }
